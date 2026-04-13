@@ -101,42 +101,53 @@ export default function Header() {
       }}
     >
       {/* ── BOVENBALK ── */}
-      <div
-        className="hidden lg:grid px-8 py-3"
-        style={{
-          gridTemplateColumns: "1fr auto 1fr",
-          borderBottom: "1px solid rgba(255,255,255,0.12)",
-        }}
-      >
-        {/* Links: mail + telefoon */}
-        <div className="flex items-center gap-3">
-          <IconBtn href="mailto:info@jgmobility.nl" title="E-mail">
-            <Mail size={15} color="white" />
-          </IconBtn>
-          <IconBtn href="tel:" title="Bellen">
-            <Phone size={15} color="white" />
-          </IconBtn>
-        </div>
+      <div className="hidden lg:block overflow-hidden">
+        <AnimatePresence initial={false}>
+          {!scrolled && (
+            <motion.div
+              key="topbar"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="grid px-8 py-3"
+              style={{
+                gridTemplateColumns: "1fr auto 1fr",
+                borderBottom: "1px solid rgba(255,255,255,0.12)",
+              }}
+            >
+              {/* Links: mail + telefoon */}
+              <div className="flex items-center gap-3">
+                <IconBtn href="mailto:info@jgmobility.nl" title="E-mail">
+                  <Mail size={15} color="white" />
+                </IconBtn>
+                <IconBtn href="tel:" title="Bellen">
+                  <Phone size={15} color="white" />
+                </IconBtn>
+              </div>
 
-        {/* Midden: logo */}
-        <Link href="/" className="flex items-center justify-center group">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/JG Mobility Transparant.png"
-            alt="JG Mobility"
-            className="h-24 w-auto object-contain transition-opacity group-hover:opacity-80"
-            style={{ filter: "brightness(0) invert(1)" }}
-          />
-        </Link>
+              {/* Midden: logo */}
+              <Link href="/" className="flex items-center justify-center group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/JG Mobility Transparant.png"
+                  alt="JG Mobility"
+                  className="h-24 w-auto object-contain transition-opacity group-hover:opacity-80"
+                  style={{ filter: "brightness(0) invert(1)" }}
+                />
+              </Link>
 
-        {/* Rechts: social icons */}
-        <div className="flex items-center justify-end gap-3">
-          {socialIcons.map((s) => (
-            <IconBtn key={s.label} href="#" title={s.label}>
-              {s.icon}
-            </IconBtn>
-          ))}
-        </div>
+              {/* Rechts: social icons */}
+              <div className="flex items-center justify-end gap-3">
+                {socialIcons.map((s) => (
+                  <IconBtn key={s.label} href="#" title={s.label}>
+                    {s.icon}
+                  </IconBtn>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* ── NAVIGATIEBALK: volle breedte gespreid ── */}
