@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -99,6 +99,17 @@ export default function AanbodClient() {
 
   const hasFilters = filterMerk !== "Alle merken" || filterModel !== "Alle modellen" || filterTransmissie !== "Alle transmissies" || filterBrandstof !== "Alle brandstof" || filterPrijs || sorteer;
 
+  const filterRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    if (filterRef.current) {
+      const top = filterRef.current.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
+  }, [filterMerk, filterModel, filterTransmissie, filterBrandstof, filterPrijs, sorteer]);
+
   const resetFilters = () => {
     setFilterMerk("Alle merken");
     setFilterModel("Alle modellen");
@@ -149,6 +160,7 @@ export default function AanbodClient() {
 
       {/* Filter balk — sticky alleen desktop */}
       <div
+        ref={filterRef}
         className="md:sticky top-[73px] z-40 px-4 md:px-6 py-4"
         style={{
           backgroundColor: "rgba(0,19,55,0.97)",
