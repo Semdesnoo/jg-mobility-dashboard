@@ -169,7 +169,7 @@ export default function AanbodClient() {
         }}
       >
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center md:gap-2">
+          <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center md:gap-3">
             <FilterSelect value={filterMerk} onChange={(v) => { setFilterMerk(v); setFilterModel("Alle modellen"); }}>
               {merken.map((m) => <option key={m} value={m} style={{ backgroundColor: "#001337" }}>{m}</option>)}
             </FilterSelect>
