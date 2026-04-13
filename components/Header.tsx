@@ -352,7 +352,7 @@ export default function Header() {
                           minHeight: "60px",
                           WebkitTapHighlightColor: "rgba(255,255,255,0.1)",
                         }}
-                        onClick={() => setMenuOpen(false)}
+                        onClick={() => { setMenuOpen(false); if (pathname === item.href) window.scrollTo({ top: 0, behavior: "smooth" }); }}
                       >
                         {item.label}
                       </a>
