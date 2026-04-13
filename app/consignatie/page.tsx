@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 const voordelen = [
   { icon: <TrendingUp size={22} />, title: "Hogere verkoopprijs", desc: "Wij kennen de markt. Wij weten hoe en waar te presenteren om de beste prijs te halen." },
-  { icon: <Clock size={22} />, title: "Jij doet niets", desc: "Geen foto's, geen advertenties, geen no-shows, geen gebel. Jij levert in — wij doen de rest." },
+  { icon: <Clock size={22} />, title: "Wij ontzorgen jou", desc: "Geen foto's, geen advertenties, geen no-shows, geen gebel. Jij levert in — wij doen de rest." },
   { icon: <Shield size={22} />, title: "Volledig veilig", desc: "Geen vreemden over de vloer, geen valse betalingen. Elke overdracht veilig en professioneel." },
   { icon: <Eye size={22} />, title: "Premiumuitstraling", desc: "Professionele fotografie en plaatsing op de juiste premium kanalen voor maximaal bereik." },
   { icon: <Handshake size={22} />, title: "Persoonlijk & direct", desc: "Jimi begeleidt het volledige verkoopproces persoonlijk. Altijd direct contact, geen tussenpersonen." },
@@ -165,7 +165,7 @@ export default function ConsignatiePage() {
             },
             {
               label: "Geen gedoe",
-              title: "U doet niets.\nWij doen alles.",
+              title: "Wij ontzorgen jou.",
               desc: "Geen advertenties schrijven, geen no-shows, geen ellenlange onderhandelingen. Laat het werk aan ons over. Van de eerste foto tot de definitieve overdracht — wij nemen het volledig uit handen.",
             },
             {

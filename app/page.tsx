@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Handshake, Search, CreditCard, Package } from "lucide-react";
 import AnimateOnScroll from "@/components/AnimateOnScroll";
 import { autos as alleAutos } from "@/lib/autos";
@@ -471,19 +472,12 @@ export default function HomePage() {
       <section className="py-24 px-6" style={{ backgroundColor: "#ffffff" }}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
           <AnimateOnScroll direction="left">
-            <div
-              className="aspect-[4/3] rounded-none flex items-center justify-center relative overflow-hidden"
-              style={{ backgroundColor: "#001337" }}
-            >
-              <div className="text-center relative z-10">
-                <div className="text-8xl font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#ffffff", opacity: 0.2 }}>JG</div>
-                <div className="text-white/40 text-xs tracking-widest uppercase mt-2" style={{ fontFamily: "var(--font-inter)" }}>
-                  Jimi Gaillard
-                </div>
-              </div>
-              <div
-                className="absolute inset-0"
-                style={{ background: "radial-gradient(ellipse at 30% 70%, rgba(255,255,255,0.12) 0%, transparent 60%)" }}
+            <div className="aspect-[4/3] rounded-none relative overflow-hidden">
+              <Image
+                src="/Showroom Jimi Gaillard.png"
+                alt="Showroom Jimi Gaillard"
+                fill
+                className="object-cover"
               />
             </div>
           </AnimateOnScroll>

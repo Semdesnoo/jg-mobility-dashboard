@@ -58,13 +58,13 @@ export default function OverOnsPage() {
 
               <div className="flex flex-col gap-5 text-sm leading-loose text-gray-500" style={{ fontFamily: "var(--font-inter)" }}>
                 <p>
-                  Zolang ik me kan herinneren, draaiden mijn gedachten om auto&apos;s. Als kind stond ik met mijn neus tegen de ruit van showrooms gedrukt, als tiener spaarde ik voor mijn eerste eigen auto. Die fascinatie is nooit weggegaan — ze is alleen groter geworden.
+                  Zolang ik me kan herinneren, draait bij mij alles om auto&apos;s. Als kind stond ik al met mijn neus tegen het raam van showrooms gedrukt en als tiener ging elke verdiende euro in een potje voor mijn eerste eigen wagen. Die fascinatie is nooit verdwenen; hij is door de jaren heen alleen maar groter geworden.
                 </p>
                 <p>
-                  Na jaren in de autobranche te hebben gewerkt — van schaderijder tot verkoopadviseur bij diverse dealers — merkte ik dat er iets ontbrak in de markt. Klanten wilden persoonlijker geholpen worden. Geen standaard scripts, geen onbegrepen druk. Gewoon eerlijk advies van iemand die wéét waar hij het over heeft.
+                  De afgelopen drie jaar heb ik van die passie mijn werk gemaakt. Ik dook de autobranche in en leerde de kneepjes van het vak bij verschillende dealers. Het was een leerzame tijd, maar ik ontdekte ook al snel waar mijn hart écht ligt: mensen eerlijk vooruithelpen. Ik merkte dat klanten geen behoefte hebben aan gladde verkooppraatjes of standaard scripts, maar aan oprecht advies van iemand die net zo enthousiast is over auto&apos;s als zijzelf.
                 </p>
                 <p>
-                  In 2024 besloot ik de stap te zetten en JG Mobility op te richten. Vanuit Barendrecht help ik particulieren en zakelijke klanten bij het kopen, verkopen en aanbieden van hun auto via consignatie. Geen grote showroom, geen overhead — wél volledige aandacht voor jou en jouw auto.
+                  Daarom doe ik het nu anders. Vanuit Barendrecht help ik je met JG Mobility bij de aan- of verkoop van je auto. Zonder die dure showroom of onnodige poespas, maar mét alle tijd en persoonlijke aandacht voor jou. Gewoon, van liefhebber tot liefhebber.
                 </p>
               </div>
 
@@ -76,7 +76,7 @@ export default function OverOnsPage() {
                   borderLeft: "3px solid #001337",
                 }}
               >
-                &ldquo;Een auto is meer dan een vervoermiddel. Het is een gevoel. Mijn doel is dat jij met een goed gevoel wegrijdt — altijd.&rdquo;
+                &ldquo;Mijn mooiste resultaat? De klik tussen jou en je nieuwe auto.&rdquo;
               </blockquote>
 
               <Link

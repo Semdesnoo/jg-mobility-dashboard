@@ -29,8 +29,6 @@ const pakketten = [
       "APK-keuring (indien nodig)",
       "Professionele interieur reiniging",
       "Lak- en bandenbehandeling",
-      "3 maanden garantie",
-      "Persoonlijke aflevering door Jimi",
     ],
     kleur: "#001337",
     tekstKleur: "#ffffff",
