@@ -161,7 +161,7 @@ export default function AanbodClient() {
       {/* Filter balk — sticky alleen desktop */}
       <div
         ref={filterRef}
-        className="md:sticky top-[73px] z-40 px-4 md:px-6 py-4"
+        className="md:sticky top-[50px] z-40 px-4 md:px-6 py-5"
         style={{
           backgroundColor: "rgba(0,19,55,0.97)",
           backdropFilter: "blur(12px)",
