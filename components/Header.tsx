@@ -214,6 +214,7 @@ export default function Header() {
             <Link
               key={item.label}
               href={item.href}
+              onClick={() => { if (active) window.scrollTo({ top: 0, behavior: "smooth" }); }}
               className="relative flex items-center px-6 py-5 font-semibold tracking-[0.18em] transition-all duration-200 hover:bg-white/5 hover:scale-[1.06] hover:-translate-y-px hover:text-white"
               style={{
                 fontFamily: "var(--font-inter)",
