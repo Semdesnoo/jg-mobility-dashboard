@@ -19,7 +19,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "JG Mobility | Premium Auto's in Barendrecht",
+  title: "JG Mobility | Uw betrouwbare autobedrijf in Barendrecht",
   description: "JG Mobility — specialist in consignatie, inkoop en verkoop van premium auto's. Gevestigd in Barendrecht.",
 };
 
