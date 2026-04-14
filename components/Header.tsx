@@ -214,7 +214,7 @@ export default function Header() {
             <Link
               key={item.label}
               href={item.href}
-              onClick={() => { if (active) window.scrollTo({ top: 0, behavior: "instant" }); }}
+              onClick={() => { if (active) { const start = window.scrollY; const duration = 500; const startTime = performance.now(); const step = (now: number) => { const elapsed = now - startTime; const progress = Math.min(elapsed / duration, 1); const ease = 1 - Math.pow(1 - progress, 4); window.scrollTo(0, start * (1 - ease)); if (progress < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }; }}
               className="relative flex items-center px-6 py-5 font-semibold tracking-[0.18em] transition-all duration-200 hover:bg-white/5 hover:scale-[1.06] hover:-translate-y-px hover:text-white"
               style={{
                 fontFamily: "var(--font-inter)",
@@ -352,7 +352,7 @@ export default function Header() {
                           minHeight: "60px",
                           WebkitTapHighlightColor: "rgba(255,255,255,0.1)",
                         }}
-                        onClick={() => { setMenuOpen(false); if (pathname === item.href) window.scrollTo({ top: 0, behavior: "instant" }); }}
+                        onClick={() => { setMenuOpen(false); if (pathname === item.href) { const start = window.scrollY; const duration = 500; const startTime = performance.now(); const step = (now: number) => { const elapsed = now - startTime; const progress = Math.min(elapsed / duration, 1); const ease = 1 - Math.pow(1 - progress, 4); window.scrollTo(0, start * (1 - ease)); if (progress < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }; }}
                       >
                         {item.label}
                       </a>
