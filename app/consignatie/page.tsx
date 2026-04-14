@@ -73,6 +73,7 @@ export default function ConsignatiePage() {
     await fetch("/api/contact", { method: "POST", body: formData });
     setLoading(false);
     setSuccess(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
