@@ -69,7 +69,7 @@ export default function ContactClient() {
       </div>
 
       {/* Appointment Scheduler */}
-      <section className="py-20 px-6" style={{ backgroundColor: "#f5f5f5" }}>
+      <section className="py-20 px-6" style={{ backgroundColor: "#ffffff" }}>
         <div className="max-w-5xl mx-auto">
           <div className="mb-10">
             <p className="text-xs tracking-widest uppercase mb-3" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
