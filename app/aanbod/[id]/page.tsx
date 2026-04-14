@@ -254,7 +254,7 @@ export default function AutoDetailPage() {
       </div>
 
       {/* Tabs balk */}
-      <div className="sticky top-[80px] z-40" style={{ backgroundColor: "rgba(0,19,55,0.97)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+      <div className="sticky top-[85px] z-40" style={{ backgroundColor: "rgba(0,19,55,0.97)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="max-w-7xl mx-auto px-6 flex items-stretch">
           {tabs.map((tab) => (
             <button
