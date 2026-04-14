@@ -129,7 +129,7 @@ export default function AppointmentScheduler() {
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="w-20 h-20 flex items-center justify-center"
+          className="w-20 h-20 flex items-center justify-center rounded-full"
           style={{ backgroundColor: "#001337" }}
         >
           <CheckCircle size={36} color="#ffffff" />
