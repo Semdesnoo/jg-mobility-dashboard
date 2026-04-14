@@ -82,15 +82,28 @@ export async function POST(req: NextRequest) {
   const opmerking = formData.get("opmerking") as string;
   const fotos = formData.getAll("fotos") as File[];
 
-  const fotoLijst = fotos.length > 0
-    ? fotos.map((f) => `• ${f.name} (${(f.size / 1024).toFixed(0)} KB)`).join("\n")
-    : "Geen foto's bijgevoegd";
+  // Foto's omzetten naar base64 bijlagen (max 4MB totaal om Vercel limiet te respecteren)
+  const bijlagen: { filename: string; content: string }[] = [];
+  let totaalGrootte = 0;
+  for (const foto of fotos) {
+    totaalGrootte += foto.size;
+    if (totaalGrootte > 4 * 1024 * 1024) break; // stop bij 4MB
+    const buffer = await foto.arrayBuffer();
+    bijlagen.push({
+      filename: foto.name,
+      content: Buffer.from(buffer).toString("base64"),
+    });
+  }
 
   await resend.emails.send({
     from: "JG Mobility Website <noreply@jgmobility.nl>",
     to: TO_EMAIL,
     replyTo: email,
     subject: `Nieuwe consignatie-aanvraag: ${merk} ${model} (${bouwjaar})`,
+    attachments: bijlagen.map((b) => ({
+      filename: b.filename,
+      content: b.content,
+    })),
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: #001337; padding: 24px; text-align: center;">
@@ -111,11 +124,9 @@ export async function POST(req: NextRequest) {
             <tr><td style="padding: 6px 0; font-size: 13px; color: #666;">Kilometerstand:</td><td style="padding: 6px 0; font-size: 13px; color: #001337;">${parseInt(km).toLocaleString("nl-NL")} km</td></tr>
             ${vraagprijs ? `<tr><td style="padding: 6px 0; font-size: 13px; color: #666;">Vraagprijs:</td><td style="padding: 6px 0; font-size: 13px; color: #001337;">€${parseInt(vraagprijs).toLocaleString("nl-NL")}</td></tr>` : ""}
           </table>
-          ${opmerking ? `<div style="padding: 16px; background: white; border-left: 3px solid #ffffff; border-radius: 4px; margin-bottom: 16px;"><p style="font-size: 13px; color: #001337; margin: 0; white-space: pre-wrap;">${opmerking}</p></div>` : ""}
+          ${opmerking ? `<div style="padding: 16px; background: white; border-left: 3px solid #001337; border-radius: 4px; margin-bottom: 16px;"><p style="font-size: 13px; color: #001337; margin: 0; white-space: pre-wrap;">${opmerking}</p></div>` : ""}
           <div style="padding: 16px; background: white; border-radius: 4px;">
-            <p style="font-size: 12px; color: #666; margin: 0 0 8px;">Bijgevoegde foto's (${fotos.length}):</p>
-            <pre style="font-size: 12px; color: #001337; margin: 0;">${fotoLijst}</pre>
-            <p style="font-size: 11px; color: #999; margin: 8px 0 0;">Foto's worden niet als bijlage verstuurd — reply op dit bericht om ze op te vragen.</p>
+            <p style="font-size: 12px; color: #666; margin: 0;">${bijlagen.length > 0 ? `${bijlagen.length} foto('s) bijgevoegd als bijlage.` : "Geen foto's bijgevoegd."}</p>
           </div>
         </div>
       </div>
