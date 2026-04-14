@@ -193,64 +193,28 @@ export default function ContactClient() {
 
             {success ? (
               <div className="flex flex-col items-center justify-center py-20 gap-6">
-                {/* Animatie container */}
-                <div className="relative flex items-center justify-center" style={{ width: 140, height: 140 }}>
-                  {/* Cirkel */}
+                {/* Check animatie */}
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex items-center justify-center rounded-full"
+                  style={{ width: 120, height: 120, backgroundColor: "#001337" }}
+                >
                   <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute inset-0 rounded-none"
-                    style={{ backgroundColor: "#001337" }}
-                  />
-                  {/* Auto rijdt in van links */}
-                  <motion.div
-                    initial={{ x: -80, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className="relative z-10"
+                    transition={{ duration: 0.4, delay: 0.4, type: "spring", stiffness: 260 }}
                   >
-                    <svg width="60" height="60" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Body */}
-                      <path d="M4 20 Q6 20 8 18 Q14 10 22 9 Q30 8 38 9 Q46 10 52 14 Q57 17 59 20 L60 20 Q62 20 62 22 L62 23 Q60 23 60 23" stroke="#ffffff" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                      {/* Roof / cabin */}
-                      <path d="M18 18 Q22 11 30 10 Q38 9 44 12 Q48 14 50 18" stroke="#ffffff" strokeWidth="1.3" fill="rgba(255,255,255,0.08)" strokeLinecap="round" strokeLinejoin="round"/>
-                      {/* Underbody */}
-                      <path d="M4 20 L4 22 Q4 23 6 23 L14 23 M22 23 L42 23 M50 23 L58 23 Q60 23 60 22 L60 20" stroke="#ffffff" strokeWidth="1.4" strokeLinecap="round"/>
-                      {/* Front splitter */}
-                      <path d="M59 20 L62 20" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round"/>
-                      {/* Rear diffuser */}
-                      <path d="M4 20 L2 21" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round"/>
-                      {/* Front wheel */}
-                      <circle cx="50" cy="23" r="4.5" stroke="#ffffff" strokeWidth="1.4"/>
-                      <circle cx="50" cy="23" r="1.8" stroke="#ffffff" strokeWidth="1"/>
-                      {/* Rear wheel */}
-                      <circle cx="16" cy="23" r="4.5" stroke="#ffffff" strokeWidth="1.4"/>
-                      <circle cx="16" cy="23" r="1.8" stroke="#ffffff" strokeWidth="1"/>
-                      {/* Side vent */}
-                      <path d="M36 17 L38 14" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
-                      <path d="M38 17 L40 14" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
-                      {/* Headlight */}
-                      <path d="M57 17 L60 18" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
+                    <CheckCircle size={56} color="#ffffff" strokeWidth={1.5} />
                   </motion.div>
-                  {/* Vinkje rechtsboven */}
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.4, delay: 1.0, type: "spring", stiffness: 300 }}
-                    className="absolute top-1 right-1 w-7 h-7 rounded-none flex items-center justify-center"
-                    style={{ backgroundColor: "#ffffff", zIndex: 20 }}
-                  >
-                    <CheckCircle size={18} color="#001337" />
-                  </motion.div>
-                </div>
+                </motion.div>
 
                 {/* Tekst */}
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 1.1 }}
+                  transition={{ duration: 0.5, delay: 0.7 }}
                   className="text-center"
                 >
                   <p className="text-xl font-bold mb-2" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
