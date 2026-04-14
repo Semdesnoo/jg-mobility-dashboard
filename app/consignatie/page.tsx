@@ -43,6 +43,7 @@ export default function ConsignatiePage() {
   const [loading, setLoading] = useState(false);
   const [fotos, setFotos] = useState<File[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
+  const successRef = useRef<HTMLDivElement>(null);
 
   const handleFotos = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -73,7 +74,12 @@ export default function ConsignatiePage() {
     await fetch("/api/contact", { method: "POST", body: formData });
     setLoading(false);
     setSuccess(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      if (successRef.current) {
+        const top = successRef.current.getBoundingClientRect().top + window.scrollY - 120;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    }, 50);
   };
 
   return (
@@ -285,7 +291,7 @@ export default function ConsignatiePage() {
           </div>
 
           {success ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-8">
+            <div ref={successRef} className="flex flex-col items-center justify-center py-24 gap-8">
               {/* Animatie container */}
               <div className="relative flex items-center justify-center" style={{ width: 160, height: 160 }}>
                 {/* Achtergrond cirkel */}
