@@ -3,6 +3,8 @@ import { Resend } from "resend";
 
 const TO_EMAIL = "info@jgmobility.nl";
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   const contentType = req.headers.get("content-type") || "";
@@ -70,7 +72,13 @@ export async function POST(req: NextRequest) {
   }
 
   // Consignatieformulier (multipart/form-data)
-  const formData = await req.formData();
+  let formData: FormData;
+  try {
+    formData = await req.formData();
+  } catch {
+    return NextResponse.json({ ok: false, error: "Formulier te groot (foto's verkleinen)" }, { status: 413 });
+  }
+
   const naam = formData.get("naam") as string;
   const email = formData.get("email") as string;
   const telefoon = formData.get("telefoon") as string;
@@ -80,7 +88,7 @@ export async function POST(req: NextRequest) {
   const km = formData.get("km") as string;
   const vraagprijs = formData.get("vraagprijs") as string;
   const opmerking = formData.get("opmerking") as string;
-  const fotos = formData.getAll("fotos") as File[];
+  const fotos = (formData.getAll("fotos") as File[]).filter(f => f.size > 0);
 
   const fotoNamen = fotos.filter(f => f.size > 0).map(f => `• ${f.name} (${(f.size / 1024).toFixed(0)} KB)`).join("<br/>");
 
@@ -111,13 +119,17 @@ export async function POST(req: NextRequest) {
   `;
 
   // Stap 1: stuur altijd de hoofdmail (zonder foto's) — gegarandeerde levering
-  await resend.emails.send({
+  const result = await resend.emails.send({
     from: "JG Mobility Website <noreply@jgmobility.nl>",
     to: TO_EMAIL,
     replyTo: email,
     subject: `Nieuwe consignatie-aanvraag: ${merk} ${model} (${bouwjaar})`,
     html: mailHtml,
   });
+  if (result.error) {
+    console.error("Resend fout:", result.error);
+    return NextResponse.json({ ok: false, error: result.error.message }, { status: 500 });
+  }
 
   // Stap 2: probeer foto's als bijlage in aparte mail — fout hier stopt de bevestiging niet
   const geldigeFotos = fotos.filter(f => f.size > 0);

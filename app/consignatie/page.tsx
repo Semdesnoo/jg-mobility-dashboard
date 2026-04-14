@@ -70,9 +70,19 @@ export default function ConsignatiePage() {
     formData.append("km", (form.elements.namedItem("km") as HTMLInputElement).value);
     formData.append("vraagprijs", (form.elements.namedItem("vraagprijs") as HTMLInputElement).value);
     formData.append("opmerking", (form.elements.namedItem("opmerking") as HTMLTextAreaElement).value);
-    fotos.forEach((foto) => formData.append("fotos", foto));
-    await fetch("/api/contact", { method: "POST", body: formData });
+    // Foto's alleen meesturen als totaal < 3MB om crashes te voorkomen
+    let totaal = 0;
+    for (const foto of fotos) {
+      if (totaal + foto.size > 3 * 1024 * 1024) break;
+      totaal += foto.size;
+      formData.append("fotos", foto);
+    }
+    const res = await fetch("/api/contact", { method: "POST", body: formData });
     setLoading(false);
+    if (!res.ok) {
+      alert("Er ging iets mis. Probeer opnieuw of stuur een e-mail naar info@jgmobility.nl");
+      return;
+    }
     setSuccess(true);
     setTimeout(() => {
       if (successRef.current) {
