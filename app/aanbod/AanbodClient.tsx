@@ -110,12 +110,16 @@ export default function AanbodClient() {
       const top = gridRef.current.getBoundingClientRect().top + window.scrollY - 80 - filterHeight;
       const start = window.scrollY;
       const distance = top - start;
-      const duration = 500;
+      if (Math.abs(distance) < 2) return;
+      const duration = Math.min(Math.max(Math.abs(distance) * 0.4, 400), 900);
       const startTime = performance.now();
       const step = (now: number) => {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 4);
+        // cubic bezier approximation: ease-in-out
+        const ease = progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
         window.scrollTo(0, start + distance * ease);
         if (progress < 1) requestAnimationFrame(step);
       };
