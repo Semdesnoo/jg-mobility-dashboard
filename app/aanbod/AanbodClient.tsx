@@ -100,13 +100,26 @@ export default function AanbodClient() {
   const hasFilters = filterMerk !== "Alle merken" || filterModel !== "Alle modellen" || filterTransmissie !== "Alle transmissies" || filterBrandstof !== "Alle brandstof" || filterPrijs || sorteer;
 
   const filterRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLElement>(null);
   const isFirstRender = useRef(true);
 
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return; }
-    if (filterRef.current) {
-      const top = filterRef.current.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top, behavior: "smooth" });
+    if (gridRef.current) {
+      const filterHeight = filterRef.current?.offsetHeight ?? 60;
+      const top = gridRef.current.getBoundingClientRect().top + window.scrollY - 80 - filterHeight;
+      const start = window.scrollY;
+      const distance = top - start;
+      const duration = 500;
+      const startTime = performance.now();
+      const step = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 4);
+        window.scrollTo(0, start + distance * ease);
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
     }
   }, [filterMerk, filterModel, filterTransmissie, filterBrandstof, filterPrijs, sorteer]);
 
@@ -205,7 +218,7 @@ export default function AanbodClient() {
       </div>
 
       {/* Grid */}
-      <section className="py-16 px-6" style={{ backgroundColor: "#f5f5f5" }}>
+      <section ref={gridRef} className="py-16 px-6" style={{ backgroundColor: "#f5f5f5" }}>
         <div className="max-w-7xl mx-auto">
           {gefilterd.length === 0 ? (
             <div className="text-center py-32">
