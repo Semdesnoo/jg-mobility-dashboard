@@ -214,7 +214,7 @@ export default function Header() {
             <Link
               key={item.label}
               href={item.href}
-              onClick={() => { if (active) window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              onClick={() => { if (active) window.scrollTo({ top: 0, behavior: "instant" }); }}
               className="relative flex items-center px-6 py-5 font-semibold tracking-[0.18em] transition-all duration-200 hover:bg-white/5 hover:scale-[1.06] hover:-translate-y-px hover:text-white"
               style={{
                 fontFamily: "var(--font-inter)",
@@ -352,7 +352,7 @@ export default function Header() {
                           minHeight: "60px",
                           WebkitTapHighlightColor: "rgba(255,255,255,0.1)",
                         }}
-                        onClick={() => { setMenuOpen(false); if (pathname === item.href) window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                        onClick={() => { setMenuOpen(false); if (pathname === item.href) window.scrollTo({ top: 0, behavior: "instant" }); }}
                       >
                         {item.label}
                       </a>
