@@ -16,10 +16,12 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   background-color: var(--white);
   color: #1a1a1a;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
