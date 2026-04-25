@@ -29,6 +29,80 @@ export type Auto = {
 
 export const autos: Auto[] = [
   {
+    id: 2,
+    merk: "BMW",
+    model: "216i Active Tourer",
+    versie: "1.5 | Navigatie | PDC | Leder stuurwiel",
+    bouwjaar: 2017,
+    bodytype: "MPV",
+    prijs: 12450,
+    km: 157478,
+    brandstof: "Benzine",
+    transmissie: "Handgeschakeld",
+    vermogen: "102 pk",
+    kleur: "Zwart",
+    apk: "07-2026",
+    btw: "Marge",
+    bekleding: "Stof",
+    kleurExterieur: "Sapphire Black metallic",
+    fotos: [
+      "/autos/BMW%20(T-731-VT)/01.jpeg",
+      "/autos/BMW%20(T-731-VT)/02.jpeg",
+      "/autos/BMW%20(T-731-VT)/03.jpeg",
+      "/autos/BMW%20(T-731-VT)/04.jpeg",
+      "/autos/BMW%20(T-731-VT)/05.jpeg",
+      "/autos/BMW%20(T-731-VT)/06.jpeg",
+      "/autos/BMW%20(T-731-VT)/07.jpeg",
+      "/autos/BMW%20(T-731-VT)/08.jpeg",
+      "/autos/BMW%20(T-731-VT)/09.jpeg",
+      "/autos/BMW%20(T-731-VT)/10.jpeg",
+      "/autos/BMW%20(T-731-VT)/11.jpeg",
+      "/autos/BMW%20(T-731-VT)/12.jpeg",
+      "/autos/BMW%20(T-731-VT)/13.jpeg",
+      "/autos/BMW%20(T-731-VT)/14.jpeg",
+    ],
+    omschrijving:
+      "Nette en goed onderhouden BMW 216i Active Tourer uit 2017. Deze compacte MPV combineert het rijplezier van BMW met een zeer praktisch en ruim interieur. De zuinige 1.5 liter 3-cilinder motor levert 102 pk en rijdt soepel en economisch. De hogere instap, flexibele achterbank en royale bagageruimte maken deze auto ideaal voor dagelijks gebruik en gezinnen.\n\nAPK geldig tot juli 2026. Marge voertuig — voor particulieren komt er geen BTW meer bij.",
+    opties: [
+      {
+        categorie: "Exterieur",
+        items: [
+          "Sapphire Black metallic lak",
+          "Lichtmetalen velgen 16/17 inch",
+          "Automatisch inschakelende koplampen",
+          "Regensensor",
+        ],
+      },
+      {
+        categorie: "Interieur",
+        items: [
+          "Multifunctioneel lederen stuurwiel",
+          "Airconditioning",
+          "Verschuifbare achterbank",
+          "Flexibel interieurconcept (Active Tourer)",
+        ],
+      },
+      {
+        categorie: "Technologie",
+        items: [
+          "BMW Navigatiesysteem (Business)",
+          "Bluetooth telefoonvoorbereiding",
+          "Kleurenscherm dashboard",
+          "Parkeersensoren achter (PDC)",
+        ],
+      },
+      {
+        categorie: "Aandrijving",
+        items: [
+          "1.5 liter 3-cilinder benzinemotor",
+          "102 pk systeemvermogen",
+          "Handgeschakelde versnellingsbak",
+          "Zuinig brandstofverbruik",
+        ],
+      },
+    ],
+  },
+  {
     id: 1,
     merk: "Volkswagen",
     model: "Golf GTE",
