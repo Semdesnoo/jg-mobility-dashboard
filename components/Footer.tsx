@@ -175,7 +175,7 @@ export default function Footer() {
           style={{ borderTop: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.2)", fontFamily: "var(--font-inter)" }}
         >
           <span>© {new Date().getFullYear()} JG Mobility. Alle rechten voorbehouden.</span>
-          <span>KvK: 42042275 &nbsp;·&nbsp; BTW: NL260450170B01</span>
+          <span>KvK: 42042275 &nbsp;·&nbsp; BTW: NL005450398B70</span>
         </div>
       </div>
     </footer>
