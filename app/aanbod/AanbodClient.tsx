@@ -9,11 +9,12 @@ import { autos } from "@/lib/autos";
 
 const prijsOpties = [
   { label: "Aanschafprijs", value: "" },
+  { label: "Tot €10.000", value: "10000" },
+  { label: "Tot €20.000", value: "20000" },
+  { label: "Tot €30.000", value: "30000" },
   { label: "Tot €50.000", value: "50000" },
   { label: "Tot €75.000", value: "75000" },
   { label: "Tot €100.000", value: "100000" },
-  { label: "Tot €125.000", value: "125000" },
-  { label: "Tot €150.000", value: "150000" },
 ];
 
 const sorteerOpties = [

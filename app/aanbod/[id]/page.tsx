@@ -126,7 +126,7 @@ export default function AutoDetailPage() {
 
               {/* Thumbnail rij */}
               {aantalFotos > 1 && (
-                <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                <div className="flex gap-2 mt-3 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
                   {auto.fotos!.map((foto, i) => (
                     <button
                       key={i}

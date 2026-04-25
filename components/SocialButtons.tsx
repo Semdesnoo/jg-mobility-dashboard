@@ -27,7 +27,7 @@ export default function SocialButtons() {
 
       {/* Instagram */}
       <a
-        href="#"
+        href="https://www.instagram.com/jgmobility/"
         title="Instagram"
         target="_blank"
         rel="noopener noreferrer"
@@ -41,7 +41,7 @@ export default function SocialButtons() {
 
       {/* Facebook */}
       <a
-        href="#"
+        href="https://www.facebook.com/profile.php?id=61588831825340"
         title="Facebook"
         target="_blank"
         rel="noopener noreferrer"

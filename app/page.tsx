@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -259,16 +259,30 @@ function ReviewsSection() {
 }
 
 export default function HomePage() {
+  const videoDesktopRef = useRef<HTMLVideoElement>(null);
+  const videoMobielRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    [videoDesktopRef, videoMobielRef].forEach((ref) => {
+      if (ref.current) {
+        ref.current.muted = true;
+        ref.current.play().catch(() => {});
+      }
+    });
+  }, []);
+
   return (
     <>
       {/* ─── HERO ─── */}
       <section className="relative w-full overflow-hidden" style={{ height: "100vh" }}>
         {/* Video achtergrond — desktop */}
         <video
+          ref={videoDesktopRef}
           autoPlay
           muted
           loop
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover hidden md:block"
         >
           <source src="/Hero%20Laptop.mp4" type="video/mp4" />
@@ -276,10 +290,12 @@ export default function HomePage() {
 
         {/* Video achtergrond — mobiel */}
         <video
+          ref={videoMobielRef}
           autoPlay
           muted
           loop
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover block md:hidden"
         >
           <source src="/Hero%20Mobiel.mp4" type="video/mp4" />

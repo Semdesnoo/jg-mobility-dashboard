@@ -119,9 +119,7 @@ export default function Footer() {
               <Clock size={14} style={{ color: "rgba(255,255,255,0.5)", marginTop: 2, flexShrink: 0 }} />
               <ul className="flex flex-col gap-2">
                 {[
-                  { dag: "Ma t/m vr", tijd: "09:00 – 18:00" },
-                  { dag: "Zaterdag", tijd: "10:00 – 17:00" },
-                  { dag: "Zondag", tijd: "Op afspraak" },
+                  { dag: "Ma t/m zo", tijd: "10:00 – 21:00" },
                 ].map((r) => (
                   <li key={r.dag} className="flex justify-between gap-4 text-xs" style={{ fontFamily: "var(--font-inter)" }}>
                     <span style={{ color: "rgba(255,255,255,0.4)" }}>{r.dag}</span>
