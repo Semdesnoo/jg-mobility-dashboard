@@ -45,7 +45,20 @@ export const autos: Auto[] = [
     btw: "Marge",
     bekleding: "Stof",
     kleurExterieur: "Deep Black Pearl metallic",
-    fotos: [],
+    fotos: [
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.28.jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.28%20(1).jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.28%20(2).jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.29.jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.29%20(1).jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.29%20(2).jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.30.jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.30%20(1).jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.31.jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.32.jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.32%20(1).jpeg",
+      "/autos/Volkswagen%20(TH-744-B)/WhatsApp%20Image%202026-04-26%20at%2015.13.32%20(3).jpeg",
+    ],
     omschrijving:
       "Nette Volkswagen Polo 1.6 TDI uit 2018 in de Comfortline Business uitvoering. Deze zuinige diesel is ideaal voor lange afstanden dankzij het lage verbruik en de rijke uitrusting. De auto is voorzien van het Discover Media navigatiesysteem met groot touchscreen, Apple CarPlay & Android Auto, en de gewilde Adaptive Cruise Control (ACC). De zwarte metallic lak (Deep Black Pearl) geeft de auto een stijlvolle uitstraling.\n\nOriginele nieuwprijs was € 22.500. Marge voertuig — voor particulieren komt er geen BTW meer bij.",
     opties: [
