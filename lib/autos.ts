@@ -29,6 +29,81 @@ export type Auto = {
 
 export const autos: Auto[] = [
   {
+    id: 5,
+    merk: "Fiat",
+    model: "500 1.2 Lounge",
+    versie: "69 pk | Panoramadak | Airco | Blue&Me | PDC achter",
+    bouwjaar: 2013,
+    bodytype: "Hatchback",
+    prijs: 4950,
+    km: 171193,
+    brandstof: "Benzine",
+    transmissie: "Handgeschakeld",
+    vermogen: "69 pk",
+    kleur: "Grijs",
+    apk: "Onbekend",
+    btw: "Marge",
+    bekleding: "Stof",
+    kleurExterieur: "Grigio Campovolo",
+    fotos: [
+      "/autos/Fiat%20(K-576-ZJ)/01.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/03.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/02.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/07.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/05.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/08.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/09.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/04.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/06.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/10.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/11.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/12.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/13.jpeg",
+      "/autos/Fiat%20(K-576-ZJ)/14.jpeg",
+    ],
+    omschrijving:
+      "Charmante en goed verzorgde Fiat 500 1.2 Lounge uit 2013, in 2021 naar Nederland geïmporteerd. De tijdloze Fiat 500 in de gewilde Lounge-uitvoering combineert Italiaans design met praktisch stadsgebruik. De betrouwbare 1.2 viercilinder (69 pk) is zuinig, makkelijk te rijden en eenvoudig in onderhoud.\n\nHét kenmerk van de Lounge is het vaste panoramadak dat de compacte cabine heerlijk licht en ruimtelijk maakt. Ideale auto voor de stad of als tweede auto. Marge voertuig — voor particulieren komt er geen BTW meer bij.",
+    opties: [
+      {
+        categorie: "Exterieur",
+        items: [
+          "Vast panoramadak met zonnescherm (kenmerk Lounge)",
+          "Grigio Campovolo lak",
+          "Chroompakket (bumpers, raamomlijsting, uitlaatmond)",
+          "15 inch lichtmetalen velgen",
+          "Mistlampen voor",
+        ],
+      },
+      {
+        categorie: "Interieur",
+        items: [
+          "Multifunctioneel lederen stuurwiel",
+          "Airconditioning",
+          "Gestoelde bekleding met 500-logo",
+          "Elektrische ramen voor",
+        ],
+      },
+      {
+        categorie: "Technologie",
+        items: [
+          "Blue&Me infotainment (Bluetooth, handsfree bellen)",
+          "USB-aansluiting voor muziek",
+          "Parkeersensoren achter (PDC)",
+          "Boordcomputer",
+        ],
+      },
+      {
+        categorie: "Aandrijving",
+        items: [
+          "1.2 viercilinder benzinemotor — 69 pk",
+          "5-traps handgeschakelde versnellingsbak",
+          "Zuinig en betrouwbaar stadsblok",
+          "Start/stop systeem",
+        ],
+      },
+    ],
+  },
+  {
     id: 4,
     merk: "Volkswagen",
     model: "Tiguan 1.5 TSI R-Line",
