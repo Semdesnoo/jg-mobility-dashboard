@@ -363,7 +363,7 @@ export default function AutoDetailPage() {
                   <div className="flex flex-col gap-4">
                     {[
                       { icon: <Mail size={14} />, label: "E-mail", value: "info@jgmobility.nl", href: `mailto:info@jgmobility.nl?subject=Interesse ${auto.merk} ${auto.model}` },
-                      { icon: <Phone size={14} />, label: "Telefoon", value: "Op aanvraag", href: "#" },
+                      { icon: <Phone size={14} />, label: "Telefoon", value: "+31 6 21331374", href: "tel:+31621331374" },
                       { icon: <MapPin size={14} />, label: "Locatie", value: "Barendrecht, Zuid-Holland", href: "#" },
                     ].map((item) => (
                       <a key={item.label} href={item.href} className="flex items-center gap-4 group">
