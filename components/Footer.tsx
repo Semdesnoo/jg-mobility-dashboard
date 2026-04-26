@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, MapPin, Clock } from "lucide-react";
+import { Mail, MapPin, Clock, Phone } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -107,6 +107,16 @@ export default function Footer() {
             >
               <Mail size={14} style={{ color: "rgba(255,255,255,0.5)" }} />
               info@jgmobility.nl
+            </a>
+            <a
+              href="tel:+31621331374"
+              className="flex items-center gap-3 text-sm transition-colors mt-3"
+              style={{ color: "rgba(255,255,255,0.4)", fontFamily: "var(--font-inter)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
+            >
+              <Phone size={14} style={{ color: "rgba(255,255,255,0.5)" }} />
+              +31 6 21331374
             </a>
           </div>
 

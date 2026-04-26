@@ -162,7 +162,9 @@ export default function ContactClient() {
                   <Phone size={14} color="#001337" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: "#001337", fontFamily: "var(--font-inter)" }}>Op aanvraag</p>
+                  <a href="tel:+31621331374" className="text-sm font-semibold hover:opacity-70 transition-opacity" style={{ color: "#001337", fontFamily: "var(--font-inter)" }}>
+                    +31 6 21331374
+                  </a>
                   <p className="text-xs mt-0.5 text-gray-400" style={{ fontFamily: "var(--font-inter)" }}>Telefoonnummer</p>
                 </div>
               </li>

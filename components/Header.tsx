@@ -127,7 +127,7 @@ export default function Header() {
             <IconBtn href="mailto:info@jgmobility.nl" title="E-mail">
               <Mail size={15} color="white" />
             </IconBtn>
-            <IconBtn href="tel:" title="Bellen">
+            <IconBtn href="tel:+31621331374" title="Bellen">
               <Phone size={15} color="white" />
             </IconBtn>
           </div>
@@ -362,6 +362,18 @@ export default function Header() {
                     )}
                   </motion.div>
                 ))}
+              </div>
+
+              {/* Telefoonnummer */}
+              <div className="px-6 py-4 flex items-center justify-center gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                <a
+                  href="tel:+31621331374"
+                  className="flex items-center gap-2 text-sm font-semibold text-white hover:opacity-70 transition-opacity"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                >
+                  <Phone size={14} color="white" />
+                  +31 6 21331374
+                </a>
               </div>
 
               {/* Socials onderaan */}
