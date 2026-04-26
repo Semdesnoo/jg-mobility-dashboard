@@ -29,6 +29,67 @@ export type Auto = {
 
 export const autos: Auto[] = [
   {
+    id: 3,
+    merk: "Volkswagen",
+    model: "Polo 1.6 TDI",
+    versie: "Comfortline Business | Navi | ACC | PDC | Lichtmetalen velgen",
+    bouwjaar: 2018,
+    bodytype: "Hatchback",
+    prijs: 6950,
+    km: 271000,
+    brandstof: "Diesel",
+    transmissie: "Handgeschakeld",
+    vermogen: "95 pk",
+    kleur: "Zwart",
+    apk: "Onbekend",
+    btw: "Marge",
+    bekleding: "Stof",
+    kleurExterieur: "Deep Black Pearl metallic",
+    fotos: [],
+    omschrijving:
+      "Nette Volkswagen Polo 1.6 TDI uit 2018 in de Comfortline Business uitvoering. Deze zuinige diesel is ideaal voor lange afstanden dankzij het lage verbruik en de rijke uitrusting. De auto is voorzien van het Discover Media navigatiesysteem met groot touchscreen, Apple CarPlay & Android Auto, en de gewilde Adaptive Cruise Control (ACC). De zwarte metallic lak (Deep Black Pearl) geeft de auto een stijlvolle uitstraling.\n\nOriginele nieuwprijs was € 22.500. Marge voertuig — voor particulieren komt er geen BTW meer bij.",
+    opties: [
+      {
+        categorie: "Infotainment & Techniek",
+        items: [
+          "Discover Media navigatiesysteem (groot touchscreen)",
+          "Apple CarPlay & Android Auto",
+          "Adaptive Cruise Control (ACC)",
+          "Front Assist (noodremassistent)",
+          "Bluetooth telefoonvoorbereiding",
+        ],
+      },
+      {
+        categorie: "Comfort & Interieur",
+        items: [
+          "Airconditioning",
+          "Multifunctioneel lederen stuurwiel",
+          "Middenarmsteun voor",
+          "Comfortstoelen met stoffen bekleding",
+          "Elektrische ramen voor en achter",
+        ],
+      },
+      {
+        categorie: "Exterieur & Parkeren",
+        items: [
+          "Deep Black Pearl metallic lak",
+          "15 inch lichtmetalen velgen",
+          "LED-dagrijverlichting",
+          "Parkeersensoren voor en achter (PDC)",
+        ],
+      },
+      {
+        categorie: "Aandrijving",
+        items: [
+          "1.6 TDI dieselmotor",
+          "95 pk vermogen",
+          "Handgeschakelde 5-traps versnellingsbak",
+          "Zuinig dieselverbruik — ideaal voor lange afstanden",
+        ],
+      },
+    ],
+  },
+  {
     id: 2,
     merk: "BMW",
     model: "216i Active Tourer",
