@@ -203,7 +203,7 @@ function ReviewsSection() {
               </div>
               <div className="h-12 w-px ml-auto" style={{ backgroundColor: "rgba(255,255,255,0.1)" }} />
               <a
-                href="https://g.page/r/jgmobility/review"
+                href="https://www.google.com/search?q=JG+Mobility&oq=jg+&gs_lcrp=EgZjaHJvbWUqCAgAEEUYJxg7MggIABBFGCcYOzIGCAEQRRg5MhAIAhAuGK8BGMcBGIAEGI4FMgcIAxAAGIAEMgYIBBBFGDwyBggFEEUYPDIGCAYQRRg8MgYIBxBFGDzSAQgyMDY3ajBqN6gCALACAA&sourceid=chrome&ie=UTF-8"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-semibold text-center hover:opacity-70 transition-opacity"
