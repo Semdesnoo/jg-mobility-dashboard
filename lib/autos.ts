@@ -343,7 +343,6 @@ export const autos: Auto[] = [
     slug: "volkswagen-golf-gte",
     merk: "Volkswagen",
     model: "Golf GTE",
-    verkocht: true,
     versie: "1.4 TSI | Automaat | Panoramadak | Navi | ACC",
     bouwjaar: 2015,
     bodytype: "Hatchback",
