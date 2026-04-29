@@ -241,7 +241,7 @@ export default function AanbodClient() {
                   transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <Link
-                    href={`/aanbod/${auto.id}`}
+                    href={`/aanbod/${auto.slug}`}
                     className="group block rounded-none overflow-hidden hover:shadow-2xl transition-all duration-500 cursor-pointer"
                     style={{ backgroundColor: "#ffffff" }}
                   >
@@ -268,6 +268,29 @@ export default function AanbodClient() {
                         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                         style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.08), transparent 70%)" }}
                       />
+                      {auto.verkocht && (
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                          <div
+                            className="absolute flex items-center justify-center"
+                            style={{
+                              width: "160%",
+                              top: "28%",
+                              left: "-30%",
+                              transform: "rotate(-35deg)",
+                              backgroundColor: "#001337",
+                              padding: "10px 0",
+                              boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
+                            }}
+                          >
+                            <span
+                              className="text-white tracking-widest uppercase"
+                              style={{ fontFamily: "var(--font-playfair)", fontSize: "22px", fontWeight: 700, letterSpacing: "0.15em" }}
+                            >
+                              Verkocht
+                            </span>
+                          </div>
+                        </div>
+                      )}
                       <div className="absolute top-4 left-4">
                         <span
                           className="text-[10px] tracking-widest uppercase px-2.5 py-1 rounded-none"

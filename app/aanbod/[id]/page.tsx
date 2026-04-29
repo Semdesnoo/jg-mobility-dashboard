@@ -14,8 +14,8 @@ const tabs = ["Kenmerken", "Opties", "Omschrijving", "Contact"];
 
 export default function AutoDetailPage() {
   const params = useParams();
-  const id = parseInt(params.id as string);
-  const auto = autos.find((a) => a.id === id);
+  const slug = params.id as string;
+  const auto = autos.find((a) => a.slug === slug);
   const [activeTab, setActiveTab] = useState("Kenmerken");
   const tabSectionRef = useRef<HTMLElement>(null);
 
@@ -40,8 +40,9 @@ export default function AutoDetailPage() {
 
   if (!auto) return notFound();
 
-  const vorigeAuto = autos.find((a) => a.id === id - 1);
-  const volgendeAuto = autos.find((a) => a.id === id + 1);
+  const huidigeIndex = autos.findIndex((a) => a.slug === slug);
+  const vorigeAuto = autos[huidigeIndex + 1];
+  const volgendeAuto = autos[huidigeIndex - 1];
 
   return (
     <>
@@ -417,7 +418,7 @@ export default function AutoDetailPage() {
       <section className="py-12 px-6" style={{ backgroundColor: "#f5f5f5", borderTop: "1px solid rgba(0,19,55,0.06)" }}>
         <div className="max-w-7xl mx-auto grid grid-cols-3 items-center gap-4">
           {vorigeAuto ? (
-            <Link href={`/aanbod/${vorigeAuto.id}`} className="group flex items-center gap-3 text-sm font-semibold hover:opacity-70 transition-opacity" style={{ color: "#001337", fontFamily: "var(--font-inter)" }}>
+            <Link href={`/aanbod/${vorigeAuto.slug}`} className="group flex items-center gap-3 text-sm font-semibold hover:opacity-70 transition-opacity" style={{ color: "#001337", fontFamily: "var(--font-inter)" }}>
               <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform flex-shrink-0" />
               <div className="min-w-0">
                 <div className="text-[10px] tracking-widest uppercase text-gray-400">Vorige</div>
@@ -431,7 +432,7 @@ export default function AutoDetailPage() {
           </Link>
 
           {volgendeAuto ? (
-            <Link href={`/aanbod/${volgendeAuto.id}`} className="group flex items-center gap-3 text-sm font-semibold text-right justify-end hover:opacity-70 transition-opacity" style={{ color: "#001337", fontFamily: "var(--font-inter)" }}>
+            <Link href={`/aanbod/${volgendeAuto.slug}`} className="group flex items-center gap-3 text-sm font-semibold text-right justify-end hover:opacity-70 transition-opacity" style={{ color: "#001337", fontFamily: "var(--font-inter)" }}>
               <div className="min-w-0">
                 <div className="text-[10px] tracking-widest uppercase text-gray-400">Volgende</div>
                 <div className="truncate">{volgendeAuto.merk} {volgendeAuto.model}</div>

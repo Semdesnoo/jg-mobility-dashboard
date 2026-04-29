@@ -1,5 +1,6 @@
 export type Auto = {
   id: number;
+  slug: string;
   merk: string;
   model: string;
   versie: string;
@@ -18,6 +19,8 @@ export type Auto = {
   kleurExterieur: string;
   // Foto's (URLs of /public paden)
   fotos?: string[];
+  // Verkocht
+  verkocht?: boolean;
   // Omschrijving
   omschrijving: string;
   // Opties per categorie
@@ -30,6 +33,7 @@ export type Auto = {
 export const autos: Auto[] = [
   {
     id: 5,
+    slug: "fiat-500-lounge",
     merk: "Fiat",
     model: "500 1.2 Lounge",
     versie: "69 pk | Panoramadak | Airco | Blue&Me | PDC achter",
@@ -105,6 +109,7 @@ export const autos: Auto[] = [
   },
   {
     id: 4,
+    slug: "volkswagen-tiguan-r-line",
     merk: "Volkswagen",
     model: "Tiguan 1.5 TSI R-Line",
     versie: "150 pk | DSG Automaat | Panoramadak | Navi | ACC | ArtVelours",
@@ -185,6 +190,7 @@ export const autos: Auto[] = [
   },
   {
     id: 3,
+    slug: "volkswagen-polo-tdi",
     merk: "Volkswagen",
     model: "Polo 1.6 TDI",
     versie: "Comfortline Business | Navi | ACC | PDC | Lichtmetalen velgen",
@@ -259,6 +265,7 @@ export const autos: Auto[] = [
   },
   {
     id: 2,
+    slug: "bmw-216i-active-tourer",
     merk: "BMW",
     model: "216i Active Tourer",
     versie: "1.5 | Navigatie | PDC | Leder stuurwiel",
@@ -333,8 +340,10 @@ export const autos: Auto[] = [
   },
   {
     id: 1,
+    slug: "volkswagen-golf-gte",
     merk: "Volkswagen",
     model: "Golf GTE",
+    verkocht: true,
     versie: "1.4 TSI | Automaat | Panoramadak | Navi | ACC",
     bouwjaar: 2015,
     bodytype: "Hatchback",
