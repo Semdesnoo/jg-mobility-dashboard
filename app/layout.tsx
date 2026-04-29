@@ -22,6 +22,11 @@ const siteUrl = "https://www.jgmobility.nl";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  icons: {
+    icon: "/JG Mobility Transparant.png",
+    shortcut: "/JG Mobility Transparant.png",
+    apple: "/JG Mobility Transparant.png",
+  },
   title: {
     default: "JG Mobility | Autobedrijf Barendrecht — Inkoop, Verkoop & Consignatie",
     template: "%s | JG Mobility",
