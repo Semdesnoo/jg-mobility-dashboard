@@ -18,9 +18,103 @@ const inter = Inter({
   display: "swap",
 });
 
+const siteUrl = "https://www.jgmobility.nl";
+
 export const metadata: Metadata = {
-  title: "JG Mobility | Uw betrouwbare autobedrijf in Barendrecht",
-  description: "JG Mobility — specialist in consignatie, inkoop en verkoop van premium auto's. Gevestigd in Barendrecht.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "JG Mobility | Autobedrijf Barendrecht — Inkoop, Verkoop & Consignatie",
+    template: "%s | JG Mobility",
+  },
+  description:
+    "JG Mobility in Barendrecht is uw specialist voor auto inkoop, verkoop en consignatie. Premium occasions, eerlijke taxatie en persoonlijk advies. Beoordeeld met 4,9 sterren.",
+  keywords: [
+    "auto inkoop Barendrecht",
+    "auto verkoop Barendrecht",
+    "consignatie auto",
+    "auto taxatie Barendrecht",
+    "occasions Barendrecht",
+    "autobedrijf Barendrecht",
+    "auto financiering",
+    "premium occasions",
+    "JG Mobility",
+    "auto inkopen Rotterdam",
+    "auto verkopen Rotterdam",
+  ],
+  authors: [{ name: "JG Mobility" }],
+  creator: "JG Mobility",
+  publisher: "JG Mobility",
+  alternates: {
+    canonical: siteUrl,
+  },
+  openGraph: {
+    type: "website",
+    locale: "nl_NL",
+    url: siteUrl,
+    siteName: "JG Mobility",
+    title: "JG Mobility | Autobedrijf Barendrecht — Inkoop, Verkoop & Consignatie",
+    description:
+      "JG Mobility in Barendrecht is uw specialist voor auto inkoop, verkoop en consignatie. Premium occasions, eerlijke taxatie en persoonlijk advies.",
+    images: [
+      {
+        url: "/JG Mobility Transparant.png",
+        width: 1200,
+        height: 630,
+        alt: "JG Mobility — Autobedrijf Barendrecht",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "JG Mobility | Autobedrijf Barendrecht",
+    description:
+      "Specialist in auto inkoop, verkoop en consignatie in Barendrecht. Beoordeeld met 4,9 sterren.",
+    images: ["/JG Mobility Transparant.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": ["AutoDealer", "LocalBusiness"],
+  name: "JG Mobility",
+  description:
+    "Specialist in auto consignatie, inkoop, taxatie en verkoop van premium occasions in Barendrecht.",
+  url: siteUrl,
+  telephone: "+31621331374",
+  email: "info@jgmobility.nl",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Barendrecht",
+    addressRegion: "Zuid-Holland",
+    addressCountry: "NL",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 51.8553,
+    longitude: 4.5328,
+  },
+  areaServed: ["Barendrecht", "Rotterdam", "Ridderkerk", "Hendrik-Ido-Ambacht", "Dordrecht"],
+  priceRange: "€€",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    bestRating: "5",
+    worstRating: "1",
+  },
+  sameAs: [
+    "https://www.instagram.com/jgmobility/",
+    "https://www.facebook.com/profile.php?id=61588831825340",
+  ],
 };
 
 export default function RootLayout({
@@ -30,6 +124,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="nl" className={`${playfair.variable} ${inter.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-screen flex flex-col overflow-x-hidden">
         <ScrollToTop />
         <Header />
