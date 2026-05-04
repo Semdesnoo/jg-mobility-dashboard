@@ -443,7 +443,21 @@ function DashboardContent({
 function EmailContent() {
   return (
     <div>
-      <PageHeader title="Email" subtitle="info@jgmobility.nl" />
+      <PageHeader
+        title="Email"
+        subtitle="info@jgmobility.nl"
+        action={
+          <a
+            href="https://mail.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold transition-all hover:opacity-70"
+            style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
+          >
+            <ExternalLink size={12} /> Open Gmail
+          </a>
+        }
+      />
       <div className="p-8">
         <GmailWidget />
       </div>
