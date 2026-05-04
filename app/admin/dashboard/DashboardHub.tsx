@@ -182,7 +182,6 @@ export default function DashboardHub() {
   const gemPrijs = beschikbaar.length
     ? Math.round(beschikbaar.reduce((s, a) => s + a.prijs, 0) / beschikbaar.length)
     : 0;
-  const totaalWaarde = beschikbaar.reduce((s, a) => s + a.prijs, 0);
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "#f0f2f5" }}>
@@ -304,6 +303,7 @@ function DashboardContent({
   lastRefresh: Date;
   goVoorraad: () => void;
 }) {
+  const totaalWaarde = beschikbaar.reduce((s, a) => s + a.prijs, 0);
   return (
     <div>
       <PageHeader
