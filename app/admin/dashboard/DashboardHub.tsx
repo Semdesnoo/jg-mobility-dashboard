@@ -716,8 +716,10 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
       <td style="vertical-align:top;width:55%">
         <div style="font-size:10.5pt;font-weight:700;color:#001337;margin-bottom:2px">JG MOBILITY</div>
         <div style="font-size:9pt;color:#64748b;line-height:1.75">
-          Arnhemseweg 10a, 2994LA<br>
-          info@jgmobility.nl &nbsp;&middot;&nbsp; www.jgmobility.nl
+          Arnhemseweg 10a<br>
+          2994LA Barendrecht<br>
+          info@jgmobility.nl<br>
+          www.jgmobility.nl
         </div>
       </td>
       <td style="text-align:right;vertical-align:top;width:45%">
