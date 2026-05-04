@@ -836,12 +836,22 @@ function FacturenContent() {
   };
 
   const printFactuur = (f: Factuur) => {
-    const w = window.open("", "_blank", "width=900,height=700");
-    if (!w) return;
-    w.document.write(genereerFactuurHTML(f));
-    w.document.close();
-    w.focus();
-    setTimeout(() => w.print(), 300);
+    const html = genereerFactuurHTML(f);
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;";
+    document.body.appendChild(iframe);
+    const doc = iframe.contentDocument ?? iframe.contentWindow?.document;
+    if (!doc) return;
+    doc.open();
+    doc.write(html);
+    doc.close();
+    iframe.contentWindow?.focus();
+    setTimeout(() => {
+      iframe.contentWindow?.print();
+      setTimeout(() => {
+        if (document.body.contains(iframe)) document.body.removeChild(iframe);
+      }, 2000);
+    }, 400);
   };
 
   const inp = (field: keyof FactuurForm) => ({
