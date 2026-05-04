@@ -702,9 +702,9 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
 <body>
 
 <!-- HEADER: logo met ingebakken achtergrond -->
-<div style="width:100%;background-color:#001337;text-align:center;line-height:0;padding:14px 0">
+<div style="width:100%;background-color:#001337;text-align:center;line-height:0;padding:10px 0">
   <img src="${logoSrc}" alt="JG Mobility"
-       style="height:55px;object-fit:contain;display:inline-block">
+       style="height:85px;object-fit:contain;display:inline-block">
 </div>
 
 <!-- BODY -->
