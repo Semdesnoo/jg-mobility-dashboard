@@ -693,63 +693,65 @@ function genereerFactuurHTML(f: Factuur, baseUrl: string): string {
 <meta charset="UTF-8">
 <title>Factuur ${f.factuur_nr}</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'Helvetica Neue',Arial,sans-serif;color:#1e293b;background:#fff;max-width:794px;margin:0 auto}
-  @media print{@page{size:A4;margin:0}body{max-width:100%}}
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  body { font-family:'Helvetica Neue',Arial,sans-serif; color:#1e293b; background:#fff; width:794px; margin:0 auto; }
+  @media print { @page { size:A4; margin:0; } body { width:100%; } }
+  table { border-collapse:collapse; }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div style="background:#001337;padding:20px 50px;text-align:center">
-  <img src="${baseUrl}/JG%20Mobility%20Transparant.png" alt="JG Mobility" style="height:64px;object-fit:contain">
+<!-- HEADER: logo met ingebakken achtergrond -->
+<div style="width:100%;text-align:center;overflow:hidden;line-height:0">
+  <img src="${baseUrl}/JG%20Mobility.png" alt="JG Mobility"
+       style="width:100%;height:100px;object-fit:cover;object-position:center;display:block">
 </div>
 
 <!-- BODY -->
-<div style="padding:32px 50px 40px">
+<div style="padding:28px 48px 44px">
 
   <!-- Bedrijf links + FACTUUR rechts -->
-  <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
+  <table style="width:100%;margin-bottom:22px">
     <tr>
-      <td style="vertical-align:top">
-        <div style="font-size:11pt;font-weight:700;color:#001337;margin-bottom:3px">JG MOBILITY</div>
-        <div style="font-size:9pt;color:#64748b;line-height:1.7">
+      <td style="vertical-align:top;width:55%">
+        <div style="font-size:10.5pt;font-weight:700;color:#001337;margin-bottom:2px">JG MOBILITY</div>
+        <div style="font-size:9pt;color:#64748b;line-height:1.75">
           Arnhemseweg 10a, 2994LA<br>
           info@jgmobility.nl &nbsp;&middot;&nbsp; www.jgmobility.nl
         </div>
       </td>
-      <td style="text-align:right;vertical-align:top">
-        <div style="font-size:30pt;font-weight:300;letter-spacing:8px;color:#001337;line-height:1">FACTUUR</div>
-        <div style="font-size:10pt;color:#94a3b8;margin-top:5px">#${f.factuur_nr}</div>
+      <td style="text-align:right;vertical-align:top;width:45%">
+        <div style="font-size:28pt;font-weight:300;letter-spacing:8px;color:#001337;line-height:1;text-transform:uppercase">Factuur</div>
+        <div style="font-size:10pt;color:#94a3b8;margin-top:6px;letter-spacing:.5px">#${f.factuur_nr}</div>
       </td>
     </tr>
   </table>
 
-  <!-- Meta + Klant -->
-  <table style="width:100%;border-collapse:collapse;padding-bottom:20px;margin-bottom:24px;border-bottom:2px solid #001337">
+  <!-- KVK/BTW/IBAN + datum links | Klant rechts -->
+  <table style="width:100%;margin-bottom:22px;padding-bottom:18px;border-bottom:1.5px solid #001337">
     <tr>
       <td style="vertical-align:top;width:50%">
-        <table style="font-size:9pt;border-collapse:collapse">
+        <table style="font-size:9pt">
           <tr>
-            <td style="color:#001337;font-weight:700;padding:1px 12px 1px 0;width:70px">KVK nr.</td>
-            <td style="color:#475569">42042275</td>
+            <td style="color:#475569;font-weight:600;padding:2px 14px 2px 0;width:64px">KVK nr.</td>
+            <td style="color:#1e293b">42042275</td>
           </tr>
           <tr>
-            <td style="color:#001337;font-weight:700;padding:1px 12px 1px 0">BTW nr.</td>
-            <td style="color:#475569">NL005450398B70</td>
+            <td style="color:#475569;font-weight:600;padding:2px 14px 2px 0">BTW nr.</td>
+            <td style="color:#1e293b">NL005450398B70</td>
           </tr>
           <tr>
-            <td style="color:#001337;font-weight:700;padding:1px 12px 1px 0">IBAN</td>
-            <td style="color:#475569">(volgt)</td>
+            <td style="color:#475569;font-weight:600;padding:2px 14px 2px 0">IBAN</td>
+            <td style="color:#1e293b">(volgt)</td>
           </tr>
         </table>
-        <div style="font-size:9pt;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#001337;margin-top:14px">
-          Datum: ${f.datum}${f.vervaldatum ? ` &nbsp;&middot;&nbsp; Vervalt: ${f.vervaldatum}` : ""}
+        <div style="font-size:9pt;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#001337;margin-top:13px">
+          Datum: ${f.datum}${f.vervaldatum ? `<br>Vervalt: ${f.vervaldatum}` : ""}
         </div>
       </td>
-      <td style="vertical-align:top;padding-left:40px;width:50%">
-        <div style="font-size:11pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;margin-bottom:5px">${f.klant_naam || "—"}</div>
-        <div style="font-size:9.5pt;color:#475569;line-height:1.7">
+      <td style="vertical-align:top;padding-left:36px;width:50%">
+        <div style="font-size:11pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;margin-bottom:6px">${f.klant_naam || "—"}</div>
+        <div style="font-size:9.5pt;color:#475569;line-height:1.75">
           ${f.klant_adres ? f.klant_adres + "<br>" : ""}
           ${[f.klant_postcode, f.klant_stad].filter(Boolean).join(" ")}${(f.klant_postcode || f.klant_stad) ? "<br>" : ""}
           ${f.klant_email ? f.klant_email + "<br>" : ""}
@@ -760,13 +762,13 @@ function genereerFactuurHTML(f: Factuur, baseUrl: string): string {
   </table>
 
   <!-- Regelstabel -->
-  <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
+  <table style="width:100%;margin-bottom:4px">
     <thead>
-      <tr style="border-bottom:2px solid #001337">
-        <th style="font-size:8pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 8px;text-align:left">Omschrijving</th>
-        <th style="font-size:8pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 8px;text-align:right;width:110px">Tarief</th>
-        <th style="font-size:8pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 8px;text-align:right;width:60px">Aantal</th>
-        <th style="font-size:8pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 8px;text-align:right;width:110px">Subtotaal</th>
+      <tr style="border-bottom:1.5px solid #001337">
+        <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:left">Omschrijving</th>
+        <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:right;width:115px">Tarief</th>
+        <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:right;width:55px">Aantal</th>
+        <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:right;width:115px">Subtotaal</th>
       </tr>
     </thead>
     <tbody>
@@ -774,34 +776,51 @@ function genereerFactuurHTML(f: Factuur, baseUrl: string): string {
     </tbody>
   </table>
 
-  <!-- Totalen -->
-  <table style="width:280px;margin-left:auto;border-collapse:collapse;margin-bottom:28px">
+  <!-- Totalen rechts uitgelijnd -->
+  <table style="width:270px;margin-left:auto;margin-bottom:30px;margin-top:10px">
     <tr>
-      <td style="font-size:10pt;color:#475569;padding:5px 0">Subtotaal</td>
-      <td style="font-size:10pt;color:#475569;text-align:right;padding:5px 0">€&nbsp;${subtotaal.toLocaleString("nl-NL")}</td>
+      <td style="font-size:9.5pt;color:#64748b;padding:4px 0">Subtotaal</td>
+      <td style="font-size:9.5pt;color:#64748b;text-align:right;padding:4px 0">€&nbsp;${subtotaal.toLocaleString("nl-NL")}</td>
     </tr>
-    ${f.btw_type === "21" ? `<tr>
-      <td style="font-size:10pt;color:#1d4ed8;padding:5px 0;border-bottom:1px solid #e2e8f0">BTW (21%)</td>
-      <td style="font-size:10pt;color:#1d4ed8;text-align:right;padding:5px 0;border-bottom:1px solid #e2e8f0">€&nbsp;${btwBedrag.toLocaleString("nl-NL")}</td>
-    </tr>` : `<tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;padding:0"></td></tr>`}
+    ${f.btw_type === "21"
+      ? `<tr>
+          <td style="font-size:9.5pt;color:#1d4ed8;padding:4px 0;border-bottom:1px solid #e2e8f0">BTW (21%)</td>
+          <td style="font-size:9.5pt;color:#1d4ed8;text-align:right;padding:4px 0;border-bottom:1px solid #e2e8f0">€&nbsp;${btwBedrag.toLocaleString("nl-NL")}</td>
+        </tr>`
+      : `<tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;padding:3px 0"></td></tr>`}
     <tr>
-      <td style="font-size:12pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;padding:10px 0 2px">Eindtotaal</td>
-      <td style="font-size:12pt;font-weight:700;color:#001337;text-align:right;padding:10px 0 2px">€&nbsp;${eindtotaal.toLocaleString("nl-NL")}</td>
+      <td style="font-size:12pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;padding:9px 0 0">Eindtotaal</td>
+      <td style="font-size:12pt;font-weight:700;color:#001337;text-align:right;padding:9px 0 0">€&nbsp;${eindtotaal.toLocaleString("nl-NL")}</td>
     </tr>
   </table>
 
   <!-- Betaaltekst -->
-  <div style="font-size:9pt;color:#475569;line-height:1.8;border-top:1px solid #e2e8f0;padding-top:18px;margin-bottom:10px">
+  <div style="font-size:9pt;color:#475569;line-height:1.85;border-top:1px solid #e2e8f0;padding-top:16px;margin-bottom:12px">
     Wij vragen u vriendelijk het bedrag van €${eindtotaal.toLocaleString("nl-NL")} ${f.vervaldatum ? `voor ${f.vervaldatum}` : "binnen 30 dagen na ontvangst"} over te maken
-    ${f.betaalwijze === "bank" ? "op rekening (IBAN volgt) onder vermelding van factuurnummer " + f.factuur_nr : "te voldoen per contant"}.
+    ${f.betaalwijze === "bank" ? "op rekening (IBAN volgt) onder vermelding van factuurnummer <strong>" + f.factuur_nr + "</strong>" : "te voldoen per contant"}.
     <br>Factuur uitgereikt door JG MOBILITY.
     ${f.btw_type === "marge" ? `<br><span style="font-size:8pt;color:#94a3b8">Op dit voertuig is de margeregeling van toepassing. BTW is niet afzonderlijk vermeld (art. 28b t/m 28h Wet OB 1968).</span>` : ""}
   </div>
 
-  ${f.notitie ? `<div style="font-size:9pt;color:#475569;font-style:italic;margin-bottom:16px">${f.notitie}</div>` : ""}
+  ${f.notitie ? `<div style="font-size:9pt;color:#475569;font-style:italic;margin-bottom:16px;padding:10px 14px;background:#f8fafc;border-left:3px solid #cbd5e1">${f.notitie}</div>` : ""}
+
+  <!-- Handtekeningen -->
+  <table style="width:100%;margin-top:36px;margin-bottom:28px">
+    <tr>
+      <td style="width:44%;vertical-align:bottom">
+        <div style="border-bottom:1px solid #94a3b8;margin-bottom:5px;height:38px"></div>
+        <div style="font-size:8pt;color:#94a3b8">Handtekening verkoper</div>
+      </td>
+      <td style="width:12%"></td>
+      <td style="width:44%;vertical-align:bottom">
+        <div style="border-bottom:1px solid #94a3b8;margin-bottom:5px;height:38px"></div>
+        <div style="font-size:8pt;color:#94a3b8">Handtekening koper &amp; datum</div>
+      </td>
+    </tr>
+  </table>
 
   <!-- Footer -->
-  <div style="text-align:center;font-size:8.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#001337;border-top:1px solid #e2e8f0;padding-top:18px;margin-top:24px">
+  <div style="text-align:center;font-size:8pt;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#001337;border-top:1px solid #e2e8f0;padding-top:16px">
     HARTELIJK DANK VOOR HET VERTROUWEN IN JG MOBILITY
   </div>
 
