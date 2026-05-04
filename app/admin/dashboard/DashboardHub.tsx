@@ -675,15 +675,15 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
   const regelRijen = [
     `<tr>
       <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;color:#1e293b;font-size:10pt">${autoOmschrijving}${autoKenteken}</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt">€&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt;width:60px">1</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt">€&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt;width:60px">1</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
     </tr>`,
     ...extraRegels.map((r) => `<tr>
       <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;color:#1e293b;font-size:10pt">${r.omschrijving}</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt">€&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt">1</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt">€&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">1</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
     </tr>`),
   ].join("");
 
@@ -730,7 +730,7 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
   </table>
 
   <!-- KVK/BTW/IBAN + datum links | Klant rechts -->
-  <table style="width:100%;margin-bottom:32px;padding-bottom:36px;border-bottom:1.5px solid #001337">
+  <table style="width:100%;margin-bottom:32px;padding-bottom:56px;border-bottom:1.5px solid #001337">
     <tr>
       <td style="vertical-align:top;width:50%">
         <table style="font-size:9pt">
@@ -751,7 +751,7 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
           Datum: ${f.datum}${f.vervaldatum ? `<br>Vervalt: ${f.vervaldatum}` : ""}
         </div>
       </td>
-      <td style="vertical-align:top;padding-left:80px;width:50%">
+      <td style="vertical-align:top;padding-left:120px;width:50%">
         <div style="font-size:11pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;margin-bottom:6px">${f.klant_naam || "—"}</div>
         <div style="font-size:9.5pt;color:#475569;line-height:1.75">
           ${f.klant_adres ? f.klant_adres + "<br>" : ""}
@@ -768,9 +768,9 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
     <thead>
       <tr style="border-bottom:1.5px solid #001337">
         <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:left">Omschrijving</th>
-        <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:right;width:115px">Tarief</th>
-        <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:right;width:55px">Aantal</th>
-        <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:right;width:115px">Subtotaal</th>
+        <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:center;width:115px">Tarief</th>
+        <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:center;width:55px">Aantal</th>
+        <th style="font-size:7.5pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 9px;text-align:center;width:115px">Subtotaal</th>
       </tr>
     </thead>
     <tbody>
