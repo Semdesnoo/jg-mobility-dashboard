@@ -702,9 +702,9 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
 <body>
 
 <!-- HEADER: logo met ingebakken achtergrond -->
-<div style="width:100%;text-align:center;overflow:hidden;line-height:0">
+<div style="width:100%;background-color:#001337;text-align:center;line-height:0;padding:14px 0">
   <img src="${logoSrc}" alt="JG Mobility"
-       style="width:100%;height:100px;object-fit:cover;object-position:center;display:block">
+       style="height:55px;object-fit:contain;display:inline-block">
 </div>
 
 <!-- BODY -->
@@ -803,21 +803,6 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
   </div>
 
   ${f.notitie ? `<div style="font-size:9pt;color:#475569;font-style:italic;margin-bottom:16px;padding:10px 14px;background:#f8fafc;border-left:3px solid #cbd5e1">${f.notitie}</div>` : ""}
-
-  <!-- Handtekeningen -->
-  <table style="width:100%;margin-top:36px;margin-bottom:28px">
-    <tr>
-      <td style="width:44%;vertical-align:bottom">
-        <div style="border-bottom:1px solid #94a3b8;margin-bottom:5px;height:38px"></div>
-        <div style="font-size:8pt;color:#94a3b8">Handtekening verkoper</div>
-      </td>
-      <td style="width:12%"></td>
-      <td style="width:44%;vertical-align:bottom">
-        <div style="border-bottom:1px solid #94a3b8;margin-bottom:5px;height:38px"></div>
-        <div style="font-size:8pt;color:#94a3b8">Handtekening koper &amp; datum</div>
-      </td>
-    </tr>
-  </table>
 
   <!-- Footer -->
   <div style="text-align:center;font-size:8pt;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#001337;border-top:1px solid #e2e8f0;padding-top:16px">
