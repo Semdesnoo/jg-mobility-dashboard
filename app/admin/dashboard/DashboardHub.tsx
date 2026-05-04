@@ -708,10 +708,10 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
 </div>
 
 <!-- BODY -->
-<div style="padding:28px 48px 44px">
+<div style="padding:44px 48px 44px">
 
   <!-- Bedrijf links + FACTUUR rechts -->
-  <table style="width:100%;margin-bottom:22px">
+  <table style="width:100%;margin-bottom:32px">
     <tr>
       <td style="vertical-align:top;width:55%">
         <div style="font-size:10.5pt;font-weight:700;color:#001337;margin-bottom:2px">JG MOBILITY</div>
@@ -730,7 +730,7 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
   </table>
 
   <!-- KVK/BTW/IBAN + datum links | Klant rechts -->
-  <table style="width:100%;margin-bottom:22px;padding-bottom:18px;border-bottom:1.5px solid #001337">
+  <table style="width:100%;margin-bottom:32px;padding-bottom:24px;border-bottom:1.5px solid #001337">
     <tr>
       <td style="vertical-align:top;width:50%">
         <table style="font-size:9pt">
