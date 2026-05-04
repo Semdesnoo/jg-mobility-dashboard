@@ -839,6 +839,7 @@ function FacturenContent() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [fout, setFout] = useState<string | null>(null);
   const [nieuwsteFactuur, setNieuwsteFactuur] = useState<Factuur | null>(null);
+  const [bewerkFactuur, setBewerkFactuur] = useState<Factuur | null>(null);
   const [rdwLaden, setRdwLaden] = useState(false);
   const [rdwStatus, setRdwStatus] = useState<"idle" | "gevonden" | "niet_gevonden">("idle");
 
@@ -887,24 +888,60 @@ function FacturenContent() {
     return () => clearTimeout(t);
   }, [form.auto_kenteken, zoekRdw]);
 
+  const startBewerken = (f: Factuur) => {
+    let parsedRegels: FactuurRegel[] = [];
+    try { parsedRegels = JSON.parse(f.regels || "[]"); } catch { /* */ }
+    while (parsedRegels.length < 3) parsedRegels.push({ omschrijving: "", prijs: "" });
+    setBewerkFactuur(f);
+    setForm({
+      klant_naam: f.klant_naam, klant_adres: f.klant_adres, klant_postcode: f.klant_postcode,
+      klant_stad: f.klant_stad, klant_email: f.klant_email, klant_telefoon: f.klant_telefoon,
+      auto_merk: f.auto_merk, auto_model: f.auto_model, auto_bouwjaar: f.auto_bouwjaar,
+      auto_kenteken: f.auto_kenteken, auto_km: f.auto_km, auto_kleur: f.auto_kleur, auto_vin: f.auto_vin,
+      verkoopprijs: String(f.verkoopprijs),
+      btw_type: f.btw_type, betaalwijze: f.betaalwijze,
+      datum: f.datum, vervaldatum: f.vervaldatum, notitie: f.notitie,
+    });
+    setRegels(parsedRegels);
+    setFout(null);
+    setView("nieuw");
+  };
+
   const sla = async () => {
     setFout(null);
     setSaving(true);
     try {
       const actieveRegels = regels.filter((r) => r.omschrijving && Number(r.prijs) > 0);
-      const res = await fetch("/api/admin/facturen", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, verkoopprijs: Number(form.verkoopprijs) || 0, regels: actieveRegels }),
-      });
-      if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        setFout(`Opslaan mislukt (${res.status})${txt ? ": " + txt.slice(0, 200) : ""}. Controleer of init-db is uitgevoerd.`);
-        return;
+      if (bewerkFactuur) {
+        const res = await fetch(`/api/admin/facturen/${bewerkFactuur.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...form, verkoopprijs: Number(form.verkoopprijs) || 0, regels: actieveRegels, fullUpdate: true }),
+        });
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          setFout(`Opslaan mislukt (${res.status})${txt ? ": " + txt.slice(0, 200) : ""}.`);
+          return;
+        }
+        const bijgewerkt: Factuur = await res.json();
+        setFacturen((prev) => prev.map((f) => (f.id === bijgewerkt.id ? bijgewerkt : f)));
+        setNieuwsteFactuur(bijgewerkt);
+        setBewerkFactuur(null);
+      } else {
+        const res = await fetch("/api/admin/facturen", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...form, verkoopprijs: Number(form.verkoopprijs) || 0, regels: actieveRegels }),
+        });
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          setFout(`Opslaan mislukt (${res.status})${txt ? ": " + txt.slice(0, 200) : ""}. Controleer of init-db is uitgevoerd.`);
+          return;
+        }
+        const nieuw: Factuur = await res.json();
+        setFacturen((prev) => [nieuw, ...prev]);
+        setNieuwsteFactuur(nieuw);
       }
-      const nieuw: Factuur = await res.json();
-      setFacturen((prev) => [nieuw, ...prev]);
-      setNieuwsteFactuur(nieuw);
       setView("lijst");
       setForm(LEEG_FORM);
       setRegels(LEEG_REGELS);
@@ -1013,11 +1050,11 @@ function FacturenContent() {
     return (
       <div>
         <PageHeader
-          title="Nieuwe factuur"
-          subtitle="Vul de gegevens in en genereer de factuur"
+          title={bewerkFactuur ? `Bewerken: ${bewerkFactuur.factuur_nr}` : "Nieuwe factuur"}
+          subtitle={bewerkFactuur ? "Wijzig de gegevens en sla op — factuurnummer blijft ongewijzigd" : "Vul de gegevens in en genereer de factuur"}
           action={
             <button
-              onClick={() => { setView("lijst"); setForm(LEEG_FORM); }}
+              onClick={() => { setView("lijst"); setForm(LEEG_FORM); setRegels(LEEG_REGELS); setBewerkFactuur(null); }}
               className="text-xs px-4 py-2 transition-all hover:opacity-70"
               style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
             >
@@ -1155,7 +1192,7 @@ function FacturenContent() {
             className="px-8 py-3.5 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-50"
             style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}
           >
-            {saving ? "Opslaan..." : "Factuur aanmaken & afdrukken"}
+            {saving ? "Opslaan..." : bewerkFactuur ? "Wijzigingen opslaan" : "Factuur aanmaken & afdrukken"}
           </button>
         </div>
       </div>
@@ -1319,13 +1356,20 @@ function FacturenContent() {
                               </button>
                             ))}
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-wrap">
                             <button
                               onClick={() => printFactuur(f)}
                               className="px-4 py-2 text-xs font-semibold transition-all hover:opacity-80"
                               style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}
                             >
                               Afdrukken / PDF
+                            </button>
+                            <button
+                              onClick={() => startBewerken(f)}
+                              className="px-4 py-2 text-xs font-semibold transition-all hover:opacity-80"
+                              style={{ border: "1px solid rgba(0,19,55,0.2)", color: "#001337", fontFamily: "var(--font-inter)" }}
+                            >
+                              Bewerken
                             </button>
                             <button
                               onClick={() => verwijder(f.id)}
