@@ -4,12 +4,13 @@ import AutoDetailClient from "./AutoDetailClient";
 
 export const dynamic = "force-dynamic";
 
-export default function AutoDetailPage({ params }: { params: { id: string } }) {
-  const auto = getAutoBySlug(params.id);
+export default async function AutoDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const auto = await getAutoBySlug(id);
   if (!auto) notFound();
 
-  const autos = getAutos();
-  const idx = autos.findIndex((a) => a.slug === params.id);
+  const autos = await getAutos();
+  const idx = autos.findIndex((a) => a.slug === id);
   const vorigeAuto = autos[idx + 1];
   const volgendeAuto = autos[idx - 1];
 
