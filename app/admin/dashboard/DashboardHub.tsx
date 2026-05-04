@@ -820,6 +820,8 @@ function FacturenContent() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [fout, setFout] = useState<string | null>(null);
   const [nieuwsteFactuur, setNieuwsteFactuur] = useState<Factuur | null>(null);
+  const [rdwLaden, setRdwLaden] = useState(false);
+  const [rdwStatus, setRdwStatus] = useState<"idle" | "gevonden" | "niet_gevonden">("idle");
 
   const laad = useCallback(async () => {
     setLoading(true);
@@ -829,6 +831,42 @@ function FacturenContent() {
   }, []);
 
   useEffect(() => { laad(); }, [laad]);
+
+  const zoekRdw = useCallback(async (kenteken: string) => {
+    const schoon = kenteken.replace(/[-\s]/g, "").toUpperCase();
+    if (schoon.length < 4) return;
+    setRdwLaden(true);
+    setRdwStatus("idle");
+    try {
+      const res = await fetch(`https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken=${schoon}`);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        const v = data[0];
+        const cap = (s: string) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
+        setForm((prev) => ({
+          ...prev,
+          auto_merk: v.merk ? cap(v.merk) : prev.auto_merk,
+          auto_model: v.handelsbenaming ? cap(v.handelsbenaming) : prev.auto_model,
+          auto_bouwjaar: v.datum_eerste_toelating ? String(v.datum_eerste_toelating).slice(0, 4) : prev.auto_bouwjaar,
+          auto_kleur: v.eerste_kleur ? cap(v.eerste_kleur) : prev.auto_kleur,
+        }));
+        setRdwStatus("gevonden");
+      } else {
+        setRdwStatus("niet_gevonden");
+      }
+    } catch {
+      setRdwStatus("niet_gevonden");
+    } finally {
+      setRdwLaden(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const schoon = form.auto_kenteken.replace(/[-\s]/g, "");
+    if (schoon.length < 4) { setRdwStatus("idle"); return; }
+    const t = setTimeout(() => zoekRdw(form.auto_kenteken), 700);
+    return () => clearTimeout(t);
+  }, [form.auto_kenteken, zoekRdw]);
 
   const sla = async () => {
     setFout(null);
@@ -962,8 +1000,24 @@ function FacturenContent() {
           )}
           {secties.map(({ titel, velden }) => (
             <div key={titel} className="mb-5" style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
-              <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+              <div className="px-5 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
                 <p className="text-[10px] font-bold uppercase tracking-wider" style={labelStijl}>{titel}</p>
+                {titel === "Voertuig" && rdwLaden && (
+                  <span className="text-[10px] flex items-center gap-1.5" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
+                    <span className="inline-block w-2.5 h-2.5 rounded-full border border-current border-t-transparent animate-spin" />
+                    RDW ophalen...
+                  </span>
+                )}
+                {titel === "Voertuig" && !rdwLaden && rdwStatus === "gevonden" && (
+                  <span className="text-[10px]" style={{ color: "#15803d", fontFamily: "var(--font-inter)" }}>
+                    ✓ Gevonden via RDW
+                  </span>
+                )}
+                {titel === "Voertuig" && !rdwLaden && rdwStatus === "niet_gevonden" && (
+                  <span className="text-[10px]" style={{ color: "#b91c1c", fontFamily: "var(--font-inter)" }}>
+                    Kenteken niet gevonden
+                  </span>
+                )}
               </div>
               <div className="p-5 grid grid-cols-2 gap-4">
                 {velden.map(({ label, field, col }) => (
