@@ -792,6 +792,8 @@ function FacturenContent() {
   const [form, setForm] = useState<FactuurForm>(LEEG_FORM);
   const [saving, setSaving] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [fout, setFout] = useState<string | null>(null);
+  const [nieuwsteFactuur, setNieuwsteFactuur] = useState<Factuur | null>(null);
 
   const laad = useCallback(async () => {
     setLoading(true);
@@ -803,20 +805,29 @@ function FacturenContent() {
   useEffect(() => { laad(); }, [laad]);
 
   const sla = async () => {
+    setFout(null);
     setSaving(true);
-    const res = await fetch("/api/admin/facturen", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, verkoopprijs: Number(form.verkoopprijs) || 0 }),
-    });
-    if (res.ok) {
+    try {
+      const res = await fetch("/api/admin/facturen", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, verkoopprijs: Number(form.verkoopprijs) || 0 }),
+      });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        setFout(`Opslaan mislukt (${res.status})${txt ? ": " + txt.slice(0, 200) : ""}. Controleer of init-db is uitgevoerd.`);
+        return;
+      }
       const nieuw: Factuur = await res.json();
       setFacturen((prev) => [nieuw, ...prev]);
+      setNieuwsteFactuur(nieuw);
       setView("lijst");
       setForm(LEEG_FORM);
-      printFactuur(nieuw);
+    } catch (err) {
+      setFout(`Netwerkfout: ${String(err)}`);
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const updateStatus = async (id: string, status: string) => {
@@ -916,6 +927,11 @@ function FacturenContent() {
           }
         />
         <div className="p-8" style={{ maxWidth: "720px" }}>
+          {fout && (
+            <div className="mb-5 px-4 py-3 text-sm" style={{ backgroundColor: "#fee2e2", border: "1px solid #fecaca", color: "#b91c1c", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}>
+              <strong>Fout:</strong> {fout}
+            </div>
+          )}
           {secties.map(({ titel, velden }) => (
             <div key={titel} className="mb-5" style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
               <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
@@ -1013,6 +1029,32 @@ function FacturenContent() {
         }
       />
       <div className="p-8">
+        {nieuwsteFactuur && (
+          <div className="mb-5 flex items-center justify-between px-4 py-3" style={{ backgroundColor: "#dcfce7", border: "1px solid #86efac", fontFamily: "var(--font-inter)" }}>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: "#15803d" }}>
+                Factuur {nieuwsteFactuur.factuur_nr} aangemaakt
+              </p>
+              <p className="text-xs" style={{ color: "#166534" }}>Klik op Afdrukken om de PDF te openen.</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => printFactuur(nieuwsteFactuur)}
+                className="px-4 py-2 text-xs font-semibold"
+                style={{ backgroundColor: "#15803d", color: "#ffffff", fontFamily: "var(--font-inter)" }}
+              >
+                Afdrukken / PDF
+              </button>
+              <button
+                onClick={() => setNieuwsteFactuur(null)}
+                className="px-3 py-2 text-xs"
+                style={{ color: "#15803d", border: "1px solid #86efac", fontFamily: "var(--font-inter)" }}
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <div className="w-6 h-6 rounded-full border-2 animate-spin" style={{ borderColor: "rgba(0,19,55,0.1)", borderTopColor: "#001337" }} />
