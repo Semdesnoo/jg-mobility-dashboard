@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import sql from "@/lib/db";
 
 const TO_EMAIL = "info@jgmobility.nl";
 
@@ -129,6 +130,20 @@ export async function POST(req: NextRequest) {
   if (result.error) {
     console.error("Resend fout:", result.error);
     return NextResponse.json({ ok: false, error: result.error.message }, { status: 500 });
+  }
+
+  // Sla op in database
+  try {
+    const now = new Date();
+    const id = `cos_${Date.now()}`;
+    const datum = now.toLocaleDateString("nl-NL");
+    const tijd = now.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
+    await sql`
+      INSERT INTO cosignaties (id, datum, tijd, naam, email, telefoon, merk, model, bouwjaar, km, vraagprijs, opmerking, aantal_fotos)
+      VALUES (${id}, ${datum}, ${tijd}, ${naam ?? ""}, ${email ?? ""}, ${telefoon ?? ""}, ${merk ?? ""}, ${model ?? ""}, ${bouwjaar ?? ""}, ${km ?? ""}, ${vraagprijs ?? ""}, ${opmerking ?? ""}, ${fotos.length})
+    `;
+  } catch {
+    // DB opslaan mislukt → mail is al verstuurd, geen blocker
   }
 
   // Stap 2: probeer foto's als bijlage in aparte mail — fout hier stopt de bevestiging niet

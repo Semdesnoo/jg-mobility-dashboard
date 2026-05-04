@@ -30,4 +30,23 @@ export async function initDB() {
       value TEXT NOT NULL
     )
   `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS cosignaties (
+      id TEXT PRIMARY KEY,
+      datum TEXT NOT NULL,
+      tijd TEXT NOT NULL,
+      naam TEXT DEFAULT '',
+      email TEXT DEFAULT '',
+      telefoon TEXT DEFAULT '',
+      merk TEXT DEFAULT '',
+      model TEXT DEFAULT '',
+      bouwjaar TEXT DEFAULT '',
+      km TEXT DEFAULT '',
+      vraagprijs TEXT DEFAULT '',
+      opmerking TEXT DEFAULT '',
+      aantal_fotos INTEGER DEFAULT 0,
+      status TEXT DEFAULT 'nieuw',
+      notitie TEXT DEFAULT ''
+    )
+  `;
 }
