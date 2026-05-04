@@ -730,7 +730,7 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
   </table>
 
   <!-- KVK/BTW/IBAN + datum links | Klant rechts -->
-  <table style="width:100%;margin-bottom:32px;padding-bottom:24px;border-bottom:1.5px solid #001337">
+  <table style="width:100%;margin-bottom:32px;padding-bottom:36px;border-bottom:1.5px solid #001337">
     <tr>
       <td style="vertical-align:top;width:50%">
         <table style="font-size:9pt">
@@ -751,7 +751,7 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
           Datum: ${f.datum}${f.vervaldatum ? `<br>Vervalt: ${f.vervaldatum}` : ""}
         </div>
       </td>
-      <td style="vertical-align:top;padding-left:36px;width:50%">
+      <td style="vertical-align:top;padding-left:80px;width:50%">
         <div style="font-size:11pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;margin-bottom:6px">${f.klant_naam || "—"}</div>
         <div style="font-size:9.5pt;color:#475569;line-height:1.75">
           ${f.klant_adres ? f.klant_adres + "<br>" : ""}
