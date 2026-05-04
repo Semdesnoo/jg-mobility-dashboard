@@ -33,7 +33,9 @@ type Auto = {
   fotos: string[];
 };
 
-const NAV: { id: Tab; label: string; icon: React.ComponentType<{ size?: number }> }[] = [
+type IconProps = { size?: number; style?: React.CSSProperties; className?: string };
+
+const NAV: { id: Tab; label: string; icon: React.ComponentType<IconProps> }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "email", label: "Email", icon: Mail },
   { id: "voorraad", label: "Auto Voorraad", icon: Car },
@@ -104,7 +106,7 @@ function PlaceholderTab({
   title,
   description,
 }: {
-  icon: React.ComponentType<{ size?: number }>;
+  icon: React.ComponentType<IconProps>;
   title: string;
   description: string;
 }) {
@@ -467,7 +469,7 @@ function EmailContent() {
 }
 
 // ── Auto Voorraad ───────────────────────────────────────────────
-function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => void }) {
+function VoorraadContent({ autos }: { autos: Auto[]; refresh: () => void }) {
   const beschikbaar = autos.filter((a) => !a.verkocht);
   const verkocht = autos.filter((a) => a.verkocht);
 
