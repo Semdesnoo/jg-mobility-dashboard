@@ -31,6 +31,32 @@ export async function initDB() {
     )
   `;
   await sql`
+    CREATE TABLE IF NOT EXISTS facturen (
+      id TEXT PRIMARY KEY,
+      factuur_nr TEXT NOT NULL,
+      datum TEXT NOT NULL,
+      vervaldatum TEXT DEFAULT '',
+      klant_naam TEXT DEFAULT '',
+      klant_adres TEXT DEFAULT '',
+      klant_postcode TEXT DEFAULT '',
+      klant_stad TEXT DEFAULT '',
+      klant_email TEXT DEFAULT '',
+      klant_telefoon TEXT DEFAULT '',
+      auto_merk TEXT DEFAULT '',
+      auto_model TEXT DEFAULT '',
+      auto_bouwjaar TEXT DEFAULT '',
+      auto_kenteken TEXT DEFAULT '',
+      auto_km TEXT DEFAULT '',
+      auto_kleur TEXT DEFAULT '',
+      auto_vin TEXT DEFAULT '',
+      verkoopprijs INTEGER DEFAULT 0,
+      btw_type TEXT DEFAULT 'marge',
+      betaalwijze TEXT DEFAULT 'bank',
+      notitie TEXT DEFAULT '',
+      status TEXT DEFAULT 'concept'
+    )
+  `;
+  await sql`
     CREATE TABLE IF NOT EXISTS cosignaties (
       id TEXT PRIMARY KEY,
       datum TEXT NOT NULL,
