@@ -15,7 +15,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 import GmailWidget from "./GmailWidget";
-import BellogWidget from "./BellogWidget";
 import DeleteButton from "./DeleteButton";
 
 type Tab = "dashboard" | "email" | "voorraad" | "cosignatie" | "social" | "facturen";
@@ -340,14 +339,9 @@ function DashboardContent({
           />
         </div>
 
-        {/* Gmail + Bellog */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-3">
-            <GmailWidget />
-          </div>
-          <div className="lg:col-span-2">
-            <BellogWidget />
-          </div>
+        {/* Gmail */}
+        <div>
+          <GmailWidget />
         </div>
 
         {/* Recente auto's */}
