@@ -658,7 +658,7 @@ const LEEG_FORM: FactuurForm = {
   vervaldatum: "", notitie: "",
 };
 
-function genereerFactuurHTML(f: Factuur, baseUrl: string): string {
+function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
   const autoBasePrijs = Number(f.verkoopprijs);
   let extraRegels: FactuurRegel[] = [];
   try { extraRegels = JSON.parse(f.regels || "[]").filter((r: FactuurRegel) => r.omschrijving && Number(r.prijs) > 0); } catch { /* */ }
@@ -703,7 +703,7 @@ function genereerFactuurHTML(f: Factuur, baseUrl: string): string {
 
 <!-- HEADER: logo met ingebakken achtergrond -->
 <div style="width:100%;text-align:center;overflow:hidden;line-height:0">
-  <img src="${baseUrl}/JG%20Mobility.png" alt="JG Mobility"
+  <img src="${logoSrc}" alt="JG Mobility"
        style="width:100%;height:100px;object-fit:cover;object-position:center;display:block">
 </div>
 
@@ -931,8 +931,22 @@ function FacturenContent() {
     if (openId === id) setOpenId(null);
   };
 
-  const printFactuur = (f: Factuur) => {
-    const html = genereerFactuurHTML(f, window.location.origin);
+  const printFactuur = async (f: Factuur) => {
+    let logoSrc = "";
+    try {
+      const res = await fetch(encodeURI("/JG Mobility.png"));
+      if (res.ok) {
+        const blob = await res.blob();
+        logoSrc = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => resolve("");
+          reader.readAsDataURL(blob);
+        });
+      }
+    } catch { /* logo niet beschikbaar */ }
+
+    const html = genereerFactuurHTML(f, logoSrc);
     const iframe = document.createElement("iframe");
     iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;";
     document.body.appendChild(iframe);
@@ -947,7 +961,7 @@ function FacturenContent() {
       setTimeout(() => {
         if (document.body.contains(iframe)) document.body.removeChild(iframe);
       }, 2000);
-    }, 400);
+    }, 500);
   };
 
   const inp = (field: keyof FactuurForm) => ({
