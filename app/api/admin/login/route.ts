@@ -13,10 +13,11 @@ export async function POST(request: NextRequest) {
   }
 
   const maxAge = 7 * 24 * 60 * 60;
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
   const response = Response.json({ ok: true });
   response.headers.set(
     "Set-Cookie",
-    `admin_token=${adminPassword}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`
+    `admin_token=${adminPassword}; Path=/; HttpOnly${secure}; SameSite=Lax; Max-Age=${maxAge}`
   );
   return response;
 }
