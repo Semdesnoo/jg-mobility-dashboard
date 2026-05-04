@@ -53,9 +53,11 @@ export async function initDB() {
       btw_type TEXT DEFAULT 'marge',
       betaalwijze TEXT DEFAULT 'bank',
       notitie TEXT DEFAULT '',
-      status TEXT DEFAULT 'concept'
+      status TEXT DEFAULT 'concept',
+      regels TEXT DEFAULT '[]'
     )
   `;
+  await sql`ALTER TABLE facturen ADD COLUMN IF NOT EXISTS regels TEXT DEFAULT '[]'`.catch(() => null);
   await sql`
     CREATE TABLE IF NOT EXISTS cosignaties (
       id TEXT PRIMARY KEY,

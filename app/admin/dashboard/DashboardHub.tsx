@@ -597,6 +597,8 @@ function VoorraadContent({ autos }: { autos: Auto[]; refresh: () => void }) {
 }
 
 // ── Facturen ────────────────────────────────────────────────────
+type FactuurRegel = { omschrijving: string; prijs: string };
+
 type Factuur = {
   id: string;
   factuur_nr: string;
@@ -620,6 +622,7 @@ type Factuur = {
   betaalwijze: string;
   notitie: string;
   status: string;
+  regels: string;
 };
 
 const FACTUUR_STATUS: Record<string, { label: string; color: string; bg: string }> = {
@@ -638,6 +641,12 @@ type FactuurForm = {
   datum: string; vervaldatum: string; notitie: string;
 };
 
+const LEEG_REGELS: FactuurRegel[] = [
+  { omschrijving: "", prijs: "" },
+  { omschrijving: "", prijs: "" },
+  { omschrijving: "", prijs: "" },
+];
+
 const LEEG_FORM: FactuurForm = {
   klant_naam: "", klant_adres: "", klant_postcode: "", klant_stad: "",
   klant_email: "", klant_telefoon: "",
@@ -649,30 +658,34 @@ const LEEG_FORM: FactuurForm = {
   vervaldatum: "", notitie: "",
 };
 
-function genereerFactuurHTML(f: Factuur): string {
-  const prijs = Number(f.verkoopprijs);
-  const exBtw = f.btw_type === "21" ? Math.round(prijs / 1.21) : 0;
-  const btwBedrag = f.btw_type === "21" ? prijs - exBtw : 0;
+function genereerFactuurHTML(f: Factuur, baseUrl: string): string {
+  const autoBasePrijs = Number(f.verkoopprijs);
+  let extraRegels: FactuurRegel[] = [];
+  try { extraRegels = JSON.parse(f.regels || "[]").filter((r: FactuurRegel) => r.omschrijving && Number(r.prijs) > 0); } catch { /* */ }
 
-  const prijsRijen =
-    f.btw_type === "21"
-      ? `<tr>
-           <td style="padding:7px 0;border-bottom:1px solid #e5e7eb;color:#374151">Voertuig excl. BTW</td>
-           <td style="text-align:right;padding:7px 0;border-bottom:1px solid #e5e7eb;color:#374151">€ ${exBtw.toLocaleString("nl-NL")}</td>
-         </tr>
-         <tr>
-           <td style="padding:7px 0;border-bottom:1px solid #e5e7eb;color:#374151">BTW 21%</td>
-           <td style="text-align:right;padding:7px 0;border-bottom:1px solid #e5e7eb;color:#374151">€ ${btwBedrag.toLocaleString("nl-NL")}</td>
-         </tr>`
-      : `<tr>
-           <td style="padding:7px 0;border-bottom:1px solid #e5e7eb;color:#374151">Voertuig (margeregeling)</td>
-           <td style="text-align:right;padding:7px 0;border-bottom:1px solid #e5e7eb;color:#374151">€ ${prijs.toLocaleString("nl-NL")}</td>
-         </tr>`;
+  const extraTotaal = extraRegels.reduce((s, r) => s + Number(r.prijs), 0);
+  const subtotaalExAuto = f.btw_type === "21" ? Math.round(autoBasePrijs / 1.21) : autoBasePrijs;
+  const subtotaal = subtotaalExAuto + extraTotaal;
+  const btwBedrag = f.btw_type === "21" ? autoBasePrijs - subtotaalExAuto : 0;
+  const eindtotaal = subtotaal + btwBedrag;
 
-  const klantAdresRegel = [f.klant_adres, [f.klant_postcode, f.klant_stad].filter(Boolean).join(" ")]
-    .filter(Boolean)
-    .map((r) => `<div style="color:#374151;font-size:10pt">${r}</div>`)
-    .join("");
+  const autoOmschrijving = [f.auto_merk, f.auto_model, f.auto_bouwjaar].filter(Boolean).join(" ") || "Voertuig";
+  const autoKenteken = f.auto_kenteken ? ` &middot; ${f.auto_kenteken.toUpperCase()}` : "";
+
+  const regelRijen = [
+    `<tr>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;color:#1e293b;font-size:10pt">${autoOmschrijving}${autoKenteken}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt">€&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt;width:60px">1</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt">€&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
+    </tr>`,
+    ...extraRegels.map((r) => `<tr>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;color:#1e293b;font-size:10pt">${r.omschrijving}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt">€&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt">1</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:right;color:#1e293b;font-size:10pt">€&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
+    </tr>`),
+  ].join("");
 
   return `<!DOCTYPE html>
 <html lang="nl">
@@ -680,107 +693,119 @@ function genereerFactuurHTML(f: Factuur): string {
 <meta charset="UTF-8">
 <title>Factuur ${f.factuur_nr}</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Helvetica Neue',Arial,sans-serif; font-size:11pt; color:#1a1a2e; background:#fff; padding:40px 50px; max-width:794px; margin:0 auto; }
-  @media print { @page { size:A4; margin:15mm 18mm; } body { padding:0; } }
-  table { border-collapse:collapse; width:100%; }
-  .lbl { font-size:9pt; color:#6b7280; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px; }
-  hr { border:none; border-top:1px solid #e5e7eb; margin:20px 0; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Helvetica Neue',Arial,sans-serif;color:#1e293b;background:#fff;max-width:794px;margin:0 auto}
+  @media print{@page{size:A4;margin:0}body{max-width:100%}}
 </style>
 </head>
 <body>
 
-<table style="margin-bottom:28px">
-  <tr>
-    <td style="vertical-align:top">
-      <div style="font-size:22pt;font-weight:800;color:#001337;letter-spacing:-.5px">JG MOBILITY</div>
-      <div style="font-size:9pt;color:#6b7280;margin-top:3px">Arnhemseweg 10a &nbsp;·&nbsp; 2994LA</div>
-      <div style="font-size:9pt;color:#6b7280">info@jgmobility.nl &nbsp;·&nbsp; www.jgmobility.nl</div>
-      <div style="font-size:9pt;color:#6b7280">+31 6 21331374</div>
-    </td>
-    <td style="text-align:right;vertical-align:top">
-      <div style="font-size:26pt;font-weight:300;color:#001337;letter-spacing:4px">FACTUUR</div>
-      <div style="font-size:10pt;color:#6b7280;margin-top:4px">${f.factuur_nr}</div>
-    </td>
-  </tr>
-</table>
+<!-- HEADER -->
+<div style="background:#001337;padding:20px 50px;text-align:center">
+  <img src="${baseUrl}/JG%20Mobility%20Transparant.png" alt="JG Mobility" style="height:64px;object-fit:contain">
+</div>
 
-<hr>
+<!-- BODY -->
+<div style="padding:32px 50px 40px">
 
-<table style="margin-bottom:28px">
-  <tr>
-    <td style="vertical-align:top;width:50%">
-      <div class="lbl">Factuurdatum</div>
-      <div style="font-size:11pt;color:#111827;margin-bottom:10px">${f.datum}</div>
-      ${f.vervaldatum ? `<div class="lbl">Vervaldatum</div><div style="font-size:11pt;color:#111827;margin-bottom:10px">${f.vervaldatum}</div>` : ""}
-      <div class="lbl">Betaalwijze</div>
-      <div style="font-size:11pt;color:#111827">${f.betaalwijze === "bank" ? "Bankoverschrijving" : "Contant"}</div>
-      ${f.betaalwijze === "bank" ? `<div style="font-size:9pt;color:#6b7280;margin-top:2px">IBAN: (volgt)</div>` : ""}
-    </td>
-    <td style="vertical-align:top;padding-left:30px;width:50%">
-      <div class="lbl">Klant</div>
-      <div style="font-size:11pt;color:#111827;font-weight:600">${f.klant_naam || "—"}</div>
-      ${klantAdresRegel}
-      ${f.klant_email ? `<div style="color:#6b7280;font-size:10pt;margin-top:4px">${f.klant_email}</div>` : ""}
-      ${f.klant_telefoon ? `<div style="color:#6b7280;font-size:10pt">${f.klant_telefoon}</div>` : ""}
-    </td>
-  </tr>
-</table>
-
-<div style="background:#f9fafb;border:1px solid #e5e7eb;padding:16px 20px;margin-bottom:24px">
-  <div class="lbl" style="margin-bottom:10px">Voertuig</div>
-  <table>
+  <!-- Bedrijf links + FACTUUR rechts -->
+  <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
     <tr>
-      <td style="width:50%;vertical-align:top">
-        <table style="font-size:10pt">
-          <tr><td style="color:#6b7280;padding:2px 16px 2px 0;width:130px">Merk &amp; Model</td><td style="color:#111827;font-weight:600">${[f.auto_merk, f.auto_model].filter(Boolean).join(" ") || "—"}</td></tr>
-          <tr><td style="color:#6b7280;padding:2px 16px 2px 0">Bouwjaar</td><td style="color:#111827">${f.auto_bouwjaar || "—"}</td></tr>
-          <tr><td style="color:#6b7280;padding:2px 16px 2px 0">Kleur</td><td style="color:#111827">${f.auto_kleur || "—"}</td></tr>
-        </table>
+      <td style="vertical-align:top">
+        <div style="font-size:11pt;font-weight:700;color:#001337;margin-bottom:3px">JG MOBILITY</div>
+        <div style="font-size:9pt;color:#64748b;line-height:1.7">
+          Arnhemseweg 10a, 2994LA<br>
+          info@jgmobility.nl &nbsp;&middot;&nbsp; www.jgmobility.nl
+        </div>
       </td>
-      <td style="width:50%;vertical-align:top">
-        <table style="font-size:10pt">
-          <tr><td style="color:#6b7280;padding:2px 16px 2px 0;width:130px">Kenteken</td><td style="color:#111827;font-weight:600;text-transform:uppercase">${f.auto_kenteken || "—"}</td></tr>
-          <tr><td style="color:#6b7280;padding:2px 16px 2px 0">Kilometerstand</td><td style="color:#111827">${f.auto_km ? parseInt(f.auto_km).toLocaleString("nl-NL") + " km" : "—"}</td></tr>
-          ${f.auto_vin ? `<tr><td style="color:#6b7280;padding:2px 16px 2px 0">VIN</td><td style="color:#111827;font-size:9pt">${f.auto_vin}</td></tr>` : ""}
-        </table>
+      <td style="text-align:right;vertical-align:top">
+        <div style="font-size:30pt;font-weight:300;letter-spacing:8px;color:#001337;line-height:1">FACTUUR</div>
+        <div style="font-size:10pt;color:#94a3b8;margin-top:5px">#${f.factuur_nr}</div>
       </td>
     </tr>
   </table>
-</div>
 
-<table style="margin-left:auto;width:320px;margin-bottom:28px">
-  <tbody>
-    ${prijsRijen}
-    <tr style="background:#001337">
-      <td style="padding:10px 12px;color:#fff;font-weight:700;font-size:13pt">Totaal</td>
-      <td style="text-align:right;color:#fff;font-weight:700;font-size:13pt;padding:10px 12px">€ ${prijs.toLocaleString("nl-NL")}</td>
+  <!-- Meta + Klant -->
+  <table style="width:100%;border-collapse:collapse;padding-bottom:20px;margin-bottom:24px;border-bottom:2px solid #001337">
+    <tr>
+      <td style="vertical-align:top;width:50%">
+        <table style="font-size:9pt;border-collapse:collapse">
+          <tr>
+            <td style="color:#001337;font-weight:700;padding:1px 12px 1px 0;width:70px">KVK nr.</td>
+            <td style="color:#475569">42042275</td>
+          </tr>
+          <tr>
+            <td style="color:#001337;font-weight:700;padding:1px 12px 1px 0">BTW nr.</td>
+            <td style="color:#475569">NL005450398B70</td>
+          </tr>
+          <tr>
+            <td style="color:#001337;font-weight:700;padding:1px 12px 1px 0">IBAN</td>
+            <td style="color:#475569">(volgt)</td>
+          </tr>
+        </table>
+        <div style="font-size:9pt;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#001337;margin-top:14px">
+          Datum: ${f.datum}${f.vervaldatum ? ` &nbsp;&middot;&nbsp; Vervalt: ${f.vervaldatum}` : ""}
+        </div>
+      </td>
+      <td style="vertical-align:top;padding-left:40px;width:50%">
+        <div style="font-size:11pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;margin-bottom:5px">${f.klant_naam || "—"}</div>
+        <div style="font-size:9.5pt;color:#475569;line-height:1.7">
+          ${f.klant_adres ? f.klant_adres + "<br>" : ""}
+          ${[f.klant_postcode, f.klant_stad].filter(Boolean).join(" ")}${(f.klant_postcode || f.klant_stad) ? "<br>" : ""}
+          ${f.klant_email ? f.klant_email + "<br>" : ""}
+          ${f.klant_telefoon || ""}
+        </div>
+      </td>
     </tr>
-  </tbody>
-</table>
+  </table>
 
-${f.notitie ? `<div style="margin-bottom:24px;padding:12px 16px;background:#f9fafb;border:1px solid #e5e7eb;font-size:10pt;color:#374151;line-height:1.6"><div class="lbl" style="margin-bottom:4px">Opmerking</div>${f.notitie}</div>` : ""}
+  <!-- Regelstabel -->
+  <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
+    <thead>
+      <tr style="border-bottom:2px solid #001337">
+        <th style="font-size:8pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 8px;text-align:left">Omschrijving</th>
+        <th style="font-size:8pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 8px;text-align:right;width:110px">Tarief</th>
+        <th style="font-size:8pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 8px;text-align:right;width:60px">Aantal</th>
+        <th style="font-size:8pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#001337;padding:0 0 8px;text-align:right;width:110px">Subtotaal</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${regelRijen}
+    </tbody>
+  </table>
 
-<table style="margin-top:44px;margin-bottom:32px">
-  <tr>
-    <td style="width:45%;vertical-align:bottom">
-      <div style="border-bottom:1px solid #9ca3af;margin-bottom:4px;height:42px"></div>
-      <div style="font-size:9pt;color:#6b7280">Handtekening verkoper</div>
-    </td>
-    <td style="width:10%"></td>
-    <td style="width:45%;vertical-align:bottom">
-      <div style="border-bottom:1px solid #9ca3af;margin-bottom:4px;height:42px"></div>
-      <div style="font-size:9pt;color:#6b7280">Handtekening koper &amp; datum</div>
-    </td>
-  </tr>
-</table>
+  <!-- Totalen -->
+  <table style="width:280px;margin-left:auto;border-collapse:collapse;margin-bottom:28px">
+    <tr>
+      <td style="font-size:10pt;color:#475569;padding:5px 0">Subtotaal</td>
+      <td style="font-size:10pt;color:#475569;text-align:right;padding:5px 0">€&nbsp;${subtotaal.toLocaleString("nl-NL")}</td>
+    </tr>
+    ${f.btw_type === "21" ? `<tr>
+      <td style="font-size:10pt;color:#1d4ed8;padding:5px 0;border-bottom:1px solid #e2e8f0">BTW (21%)</td>
+      <td style="font-size:10pt;color:#1d4ed8;text-align:right;padding:5px 0;border-bottom:1px solid #e2e8f0">€&nbsp;${btwBedrag.toLocaleString("nl-NL")}</td>
+    </tr>` : `<tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;padding:0"></td></tr>`}
+    <tr>
+      <td style="font-size:12pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;padding:10px 0 2px">Eindtotaal</td>
+      <td style="font-size:12pt;font-weight:700;color:#001337;text-align:right;padding:10px 0 2px">€&nbsp;${eindtotaal.toLocaleString("nl-NL")}</td>
+    </tr>
+  </table>
 
-<hr>
-<div style="font-size:8pt;color:#9ca3af;line-height:1.6;margin-top:10px">
-  <strong>JG MOBILITY</strong> &nbsp;·&nbsp; KvK: 42042275 &nbsp;·&nbsp; BTW: NL005450398B70
-  ${f.btw_type === "marge" ? "<br>Op dit voertuig is de margeregeling van toepassing. BTW is niet afzonderlijk vermeld (art. 28b t/m 28h Wet OB 1968)." : ""}
+  <!-- Betaaltekst -->
+  <div style="font-size:9pt;color:#475569;line-height:1.8;border-top:1px solid #e2e8f0;padding-top:18px;margin-bottom:10px">
+    Wij vragen u vriendelijk het bedrag van €${eindtotaal.toLocaleString("nl-NL")} ${f.vervaldatum ? `voor ${f.vervaldatum}` : "binnen 30 dagen na ontvangst"} over te maken
+    ${f.betaalwijze === "bank" ? "op rekening (IBAN volgt) onder vermelding van factuurnummer " + f.factuur_nr : "te voldoen per contant"}.
+    <br>Factuur uitgereikt door JG MOBILITY.
+    ${f.btw_type === "marge" ? `<br><span style="font-size:8pt;color:#94a3b8">Op dit voertuig is de margeregeling van toepassing. BTW is niet afzonderlijk vermeld (art. 28b t/m 28h Wet OB 1968).</span>` : ""}
+  </div>
+
+  ${f.notitie ? `<div style="font-size:9pt;color:#475569;font-style:italic;margin-bottom:16px">${f.notitie}</div>` : ""}
+
+  <!-- Footer -->
+  <div style="text-align:center;font-size:8.5pt;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#001337;border-top:1px solid #e2e8f0;padding-top:18px;margin-top:24px">
+    HARTELIJK DANK VOOR HET VERTROUWEN IN JG MOBILITY
+  </div>
+
 </div>
-
 </body>
 </html>`;
 }
@@ -790,6 +815,7 @@ function FacturenContent() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"lijst" | "nieuw">("lijst");
   const [form, setForm] = useState<FactuurForm>(LEEG_FORM);
+  const [regels, setRegels] = useState<FactuurRegel[]>(LEEG_REGELS);
   const [saving, setSaving] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [fout, setFout] = useState<string | null>(null);
@@ -808,10 +834,11 @@ function FacturenContent() {
     setFout(null);
     setSaving(true);
     try {
+      const actieveRegels = regels.filter((r) => r.omschrijving && Number(r.prijs) > 0);
       const res = await fetch("/api/admin/facturen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, verkoopprijs: Number(form.verkoopprijs) || 0 }),
+        body: JSON.stringify({ ...form, verkoopprijs: Number(form.verkoopprijs) || 0, regels: actieveRegels }),
       });
       if (!res.ok) {
         const txt = await res.text().catch(() => "");
@@ -823,6 +850,7 @@ function FacturenContent() {
       setNieuwsteFactuur(nieuw);
       setView("lijst");
       setForm(LEEG_FORM);
+      setRegels(LEEG_REGELS);
     } catch (err) {
       setFout(`Netwerkfout: ${String(err)}`);
     } finally {
@@ -847,7 +875,7 @@ function FacturenContent() {
   };
 
   const printFactuur = (f: Factuur) => {
-    const html = genereerFactuurHTML(f);
+    const html = genereerFactuurHTML(f, window.location.origin);
     const iframe = document.createElement("iframe");
     iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;";
     document.body.appendChild(iframe);
@@ -980,6 +1008,41 @@ function FacturenContent() {
                 <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Vervaldatum</label>
                 <input type="text" {...inp("vervaldatum")} placeholder="bijv. 30-05-2026" className="w-full px-3 py-2 text-sm outline-none" style={veldStijl} />
               </div>
+            </div>
+          </div>
+
+          {/* Extra regels */}
+          <div className="mb-5" style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+            <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+              <p className="text-[10px] font-bold uppercase tracking-wider" style={labelStijl}>Extra regels (optioneel — bv. banden, garantie)</p>
+            </div>
+            <div className="p-5 flex flex-col gap-3">
+              {regels.map((r, i) => (
+                <div key={i} className="flex gap-3">
+                  <div className="flex-1">
+                    {i === 0 && <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Omschrijving</label>}
+                    <input
+                      type="text"
+                      value={r.omschrijving}
+                      onChange={(e) => setRegels((prev) => prev.map((x, j) => j === i ? { ...x, omschrijving: e.target.value } : x))}
+                      placeholder="bijv. Banden, Garantie, Service..."
+                      className="w-full px-3 py-2 text-sm outline-none"
+                      style={veldStijl}
+                    />
+                  </div>
+                  <div style={{ width: "130px" }}>
+                    {i === 0 && <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Prijs (€)</label>}
+                    <input
+                      type="number"
+                      value={r.prijs}
+                      onChange={(e) => setRegels((prev) => prev.map((x, j) => j === i ? { ...x, prijs: e.target.value } : x))}
+                      placeholder="0"
+                      className="w-full px-3 py-2 text-sm outline-none"
+                      style={veldStijl}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

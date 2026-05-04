@@ -24,17 +24,19 @@ export async function POST(req: NextRequest) {
     const id = `fac_${Date.now()}`;
     const datum = body.datum || new Date().toLocaleDateString("nl-NL");
 
+    const regels = JSON.stringify(Array.isArray(body.regels) ? body.regels : []);
+
     await sql`
       INSERT INTO facturen (
         id, factuur_nr, datum, vervaldatum,
         klant_naam, klant_adres, klant_postcode, klant_stad, klant_email, klant_telefoon,
         auto_merk, auto_model, auto_bouwjaar, auto_kenteken, auto_km, auto_kleur, auto_vin,
-        verkoopprijs, btw_type, betaalwijze, notitie, status
+        verkoopprijs, btw_type, betaalwijze, notitie, status, regels
       ) VALUES (
         ${id}, ${factuur_nr}, ${datum}, ${body.vervaldatum ?? ""},
         ${body.klant_naam ?? ""}, ${body.klant_adres ?? ""}, ${body.klant_postcode ?? ""}, ${body.klant_stad ?? ""}, ${body.klant_email ?? ""}, ${body.klant_telefoon ?? ""},
         ${body.auto_merk ?? ""}, ${body.auto_model ?? ""}, ${body.auto_bouwjaar ?? ""}, ${body.auto_kenteken ?? ""}, ${body.auto_km ?? ""}, ${body.auto_kleur ?? ""}, ${body.auto_vin ?? ""},
-        ${body.verkoopprijs ?? 0}, ${body.btw_type ?? "marge"}, ${body.betaalwijze ?? "bank"}, ${body.notitie ?? ""}, 'concept'
+        ${body.verkoopprijs ?? 0}, ${body.btw_type ?? "marge"}, ${body.betaalwijze ?? "bank"}, ${body.notitie ?? ""}, 'concept', ${regels}
       )
     `;
 
