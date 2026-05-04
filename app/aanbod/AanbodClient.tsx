@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Gauge, Calendar, Fuel, Zap, ArrowRight, ChevronDown, X } from "lucide-react";
-import { autos } from "@/lib/autos";
+import { type Auto } from "@/lib/autos";
 
 const prijsOpties = [
   { label: "Aanschafprijs", value: "" },
@@ -50,7 +50,7 @@ function FilterSelect({ value, onChange, children }: { value: string; onChange: 
   );
 }
 
-export default function AanbodClient() {
+export default function AanbodClient({ autos }: { autos: Auto[] }) {
   const searchParams = useSearchParams();
   const merkParam = searchParams.get("merk");
   const merkInitieel = merkParam

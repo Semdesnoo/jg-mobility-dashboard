@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import AanbodClient from "./AanbodClient";
+import { getAutos } from "@/lib/autos-db";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +19,11 @@ export const metadata = {
   },
 };
 
-export default function AanbodPage() {
+export default async function AanbodPage() {
+  const autos = await getAutos();
   return (
     <Suspense>
-      <AanbodClient />
+      <AanbodClient autos={autos} />
     </Suspense>
   );
 }

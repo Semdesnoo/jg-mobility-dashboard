@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -134,25 +135,31 @@ const jsonLd = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "";
+  const isAdmin = pathname.startsWith("/admin");
+
   return (
     <html lang="nl" className={`${playfair.variable} ${inter.variable}`}>
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        {!isAdmin && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+        )}
       </head>
       <body className="min-h-screen flex flex-col overflow-x-hidden">
-        <ScrollToTop />
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <ChatWidget />
+        {!isAdmin && <ScrollToTop />}
+        {!isAdmin && <Header />}
+        <main className={isAdmin ? "flex-1" : "flex-1"}>{children}</main>
+        {!isAdmin && <Footer />}
+        {!isAdmin && <ChatWidget />}
       </body>
     </html>
   );

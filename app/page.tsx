@@ -467,7 +467,7 @@ export default function HomePage() {
                     </div>
 
                     <Link
-                      href={`/aanbod/${auto.id}`}
+                      href={`/aanbod/${auto.slug}`}
                       className="block w-full text-center py-3 rounded-none text-sm font-semibold tracking-wide transition-all group-hover:shadow-lg"
                       style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}
                     >
