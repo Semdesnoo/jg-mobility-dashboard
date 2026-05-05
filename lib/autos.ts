@@ -19,8 +19,9 @@ export type Auto = {
   kleurExterieur: string;
   // Foto's (URLs of /public paden)
   fotos?: string[];
-  // Verkocht
+  // Status
   verkocht?: boolean;
+  gereserveerd?: boolean;
   // Omschrijving
   omschrijving: string;
   // Opties per categorie

@@ -291,6 +291,29 @@ export default function AanbodClient({ autos }: { autos: Auto[] }) {
                           </div>
                         </div>
                       )}
+                      {auto.gereserveerd && !auto.verkocht && (
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                          <div
+                            className="absolute flex items-center justify-center"
+                            style={{
+                              width: "160%",
+                              top: "28%",
+                              left: "-30%",
+                              transform: "rotate(-35deg)",
+                              backgroundColor: "#b45309",
+                              padding: "10px 0",
+                              boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+                            }}
+                          >
+                            <span
+                              className="text-white tracking-widest uppercase"
+                              style={{ fontFamily: "var(--font-playfair)", fontSize: "22px", fontWeight: 700, letterSpacing: "0.15em" }}
+                            >
+                              Gereserveerd
+                            </span>
+                          </div>
+                        </div>
+                      )}
                       <div className="absolute top-4 left-4">
                         <span
                           className="text-[10px] tracking-widest uppercase px-2.5 py-1 rounded-none"

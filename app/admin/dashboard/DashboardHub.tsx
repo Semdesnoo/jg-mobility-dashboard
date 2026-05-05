@@ -29,6 +29,7 @@ type Auto = {
   brandstof: string;
   prijs: number;
   verkocht: boolean;
+  gereserveerd?: boolean;
   fotos: string[];
 };
 
@@ -466,9 +467,18 @@ function EmailContent() {
 }
 
 // ── Auto Voorraad ───────────────────────────────────────────────
-function VoorraadContent({ autos }: { autos: Auto[]; refresh: () => void }) {
+function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => void }) {
   const beschikbaar = autos.filter((a) => !a.verkocht);
   const verkocht = autos.filter((a) => a.verkocht);
+
+  const updateStatus = async (id: number, status: "beschikbaar" | "gereserveerd" | "verkocht") => {
+    await fetch(`/api/admin/autos/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    refresh();
+  };
 
   return (
     <div>
@@ -548,15 +558,13 @@ function VoorraadContent({ autos }: { autos: Auto[]; refresh: () => void }) {
                       {auto.merk} {auto.model}
                     </p>
                     {auto.verkocht && (
-                      <span
-                        className="text-[9px] px-1.5 py-0.5 tracking-widest uppercase"
-                        style={{
-                          backgroundColor: "#001337",
-                          color: "#ffffff",
-                          fontFamily: "var(--font-inter)",
-                        }}
-                      >
+                      <span className="text-[9px] px-1.5 py-0.5 tracking-widest uppercase" style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}>
                         Verkocht
+                      </span>
+                    )}
+                    {auto.gereserveerd && !auto.verkocht && (
+                      <span className="text-[9px] px-1.5 py-0.5 tracking-widest uppercase" style={{ backgroundColor: "#b45309", color: "#ffffff", fontFamily: "var(--font-inter)" }}>
+                        Gereserveerd
                       </span>
                     )}
                   </div>
@@ -582,15 +590,34 @@ function VoorraadContent({ autos }: { autos: Auto[]; refresh: () => void }) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  {(["beschikbaar", "gereserveerd", "verkocht"] as const).map((s) => {
+                    const active = s === "verkocht" ? auto.verkocht : s === "gereserveerd" ? auto.gereserveerd && !auto.verkocht : !auto.verkocht && !auto.gereserveerd;
+                    const colors: Record<string, { bg: string; color: string }> = {
+                      beschikbaar: { bg: "#dcfce7", color: "#15803d" },
+                      gereserveerd: { bg: "#fef3c7", color: "#b45309" },
+                      verkocht: { bg: "#001337", color: "#ffffff" },
+                    };
+                    return (
+                      <button
+                        key={s}
+                        onClick={() => updateStatus(auto.id, s)}
+                        className="px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase transition-all hover:opacity-80"
+                        style={{
+                          backgroundColor: active ? colors[s].bg : "transparent",
+                          color: active ? colors[s].color : "rgba(0,19,55,0.3)",
+                          border: `1px solid ${active ? colors[s].color : "rgba(0,19,55,0.12)"}`,
+                          fontFamily: "var(--font-inter)",
+                        }}
+                      >
+                        {s === "beschikbaar" ? "Beschikbaar" : s === "gereserveerd" ? "Gereserveerd" : "Verkocht"}
+                      </button>
+                    );
+                  })}
                   <Link
                     href={`/aanbod/${auto.slug}`}
                     target="_blank"
                     className="px-3 py-1.5 text-xs font-semibold transition-all hover:opacity-70"
-                    style={{
-                      border: "1px solid rgba(0,19,55,0.15)",
-                      color: "#001337",
-                      fontFamily: "var(--font-inter)",
-                    }}
+                    style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
                   >
                     Bekijk
                   </Link>
