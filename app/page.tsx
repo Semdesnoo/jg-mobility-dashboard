@@ -433,6 +433,20 @@ export default function HomePage() {
                       className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                       style={{ background: "radial-gradient(ellipse at center, rgba(255,255,255,0.08) 0%, transparent 70%)" }}
                     />
+                    {auto.verkocht && (
+                      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                        <div className="absolute flex items-center justify-center" style={{ width: "160%", top: "28%", left: "-30%", transform: "rotate(-35deg)", backgroundColor: "#001337", padding: "10px 0", boxShadow: "0 4px 24px rgba(0,0,0,0.5)" }}>
+                          <span className="text-white tracking-widest uppercase" style={{ fontFamily: "var(--font-playfair)", fontSize: "22px", fontWeight: 700, letterSpacing: "0.15em" }}>Verkocht</span>
+                        </div>
+                      </div>
+                    )}
+                    {auto.gereserveerd && !auto.verkocht && (
+                      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                        <div className="absolute flex items-center justify-center" style={{ width: "160%", top: "28%", left: "-30%", transform: "rotate(-35deg)", backgroundColor: "#b45309", padding: "10px 0", boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}>
+                          <span className="text-white tracking-widest uppercase" style={{ fontFamily: "var(--font-playfair)", fontSize: "22px", fontWeight: 700, letterSpacing: "0.15em" }}>Gereserveerd</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Info */}
