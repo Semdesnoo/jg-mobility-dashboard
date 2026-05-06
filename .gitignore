@@ -42,3 +42,5 @@ next-env.d.ts
 
 # Gmail OAuth token — bevat persoonlijke toegangstokens
 /data/gmail-token.json
+
+.vercel

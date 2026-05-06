@@ -55,7 +55,7 @@ function PageHeader({
 }) {
   return (
     <div
-      className="px-8 py-5 flex items-center justify-between sticky top-0 z-10"
+      className="px-4 md:px-8 py-4 md:py-5 flex items-center justify-between sticky top-0 z-10"
       style={{ backgroundColor: "#ffffff", borderBottom: "1px solid rgba(0,19,55,0.08)" }}
     >
       <div>
@@ -113,7 +113,7 @@ function PlaceholderTab({
   return (
     <div>
       <PageHeader title={title} />
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <div
           className="flex flex-col items-center justify-center py-28"
           style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}
@@ -186,9 +186,9 @@ export default function DashboardHub() {
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "#f0f2f5" }}>
-      {/* ── Zijbalk ── */}
+      {/* ── Zijbalk (alleen desktop) ── */}
       <aside
-        className="flex flex-col flex-shrink-0"
+        className="hidden md:flex flex-col flex-shrink-0"
         style={{ width: "220px", backgroundColor: "#001337", height: "100vh" }}
       >
         {/* Logo */}
@@ -261,7 +261,7 @@ export default function DashboardHub() {
       </aside>
 
       {/* ── Hoofdinhoud ── */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
         {tab === "dashboard" && (
           <DashboardContent
             autos={autos}
@@ -284,6 +284,42 @@ export default function DashboardHub() {
         )}
         {tab === "facturen" && <FacturenContent />}
       </main>
+
+      {/* ── Bottom nav (alleen mobiel) ── */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 md:hidden flex z-50"
+        style={{ backgroundColor: "#001337", borderTop: "1px solid rgba(255,255,255,0.08)", height: "60px" }}
+      >
+        {NAV.map(({ id, icon: Icon }) => {
+          const mobileLabels: Record<Tab, string> = {
+            dashboard: "Home",
+            email: "Email",
+            voorraad: "Voorraad",
+            cosignatie: "Consignatie",
+            social: "Social",
+            facturen: "Facturen",
+          };
+          return (
+            <button
+              key={id}
+              onClick={() => setTab(id)}
+              className="flex-1 flex flex-col items-center justify-center gap-0.5 transition-all"
+            >
+              <Icon size={18} style={{ color: tab === id ? "#ffffff" : "rgba(255,255,255,0.38)" }} />
+              <span
+                style={{
+                  fontSize: "9px",
+                  fontFamily: "var(--font-inter)",
+                  color: tab === id ? "#ffffff" : "rgba(255,255,255,0.38)",
+                  letterSpacing: "0.03em",
+                }}
+              >
+                {mobileLabels[id]}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
@@ -329,7 +365,7 @@ function DashboardContent({
         }
       />
 
-      <div className="p-8 flex flex-col gap-7">
+      <div className="p-4 md:p-8 flex flex-col gap-5 md:gap-7">
         {/* Statistieken */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard label="In aanbod" value={beschikbaar.length} />
@@ -459,7 +495,7 @@ function EmailContent() {
           </a>
         }
       />
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <GmailWidget />
       </div>
     </div>
@@ -499,7 +535,7 @@ function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => voi
           </Link>
         }
       />
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         {autos.length === 0 ? (
           <div
             className="flex flex-col items-center justify-center py-28"
@@ -522,109 +558,94 @@ function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => voi
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {autos.map((auto) => (
-              <div
-                key={auto.id}
-                className="flex items-center gap-4 px-5 py-3.5"
-                style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}
-              >
+            {autos.map((auto) => {
+              const statusColors: Record<string, { bg: string; color: string }> = {
+                beschikbaar: { bg: "#dcfce7", color: "#15803d" },
+                gereserveerd: { bg: "#fef3c7", color: "#b45309" },
+                verkocht: { bg: "#001337", color: "#ffffff" },
+              };
+              return (
                 <div
-                  className="flex-shrink-0 w-20 h-14 overflow-hidden"
-                  style={{ backgroundColor: "#001337" }}
+                  key={auto.id}
+                  className="flex flex-col md:flex-row md:items-center gap-2.5 md:gap-4 px-4 md:px-5 py-3.5"
+                  style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}
                 >
-                  {auto.fotos?.length > 0 ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={auto.fotos[0]} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span
-                        className="text-lg font-bold"
-                        style={{
-                          color: "rgba(255,255,255,0.15)",
-                          fontFamily: "var(--font-playfair)",
-                        }}
-                      >
-                        {auto.merk.slice(0, 2).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <p
-                      className="text-sm font-bold truncate"
-                      style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}
+                  {/* Bovenste rij: foto + info + prijs */}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div
+                      className="flex-shrink-0 w-16 md:w-20 h-11 md:h-14 overflow-hidden"
+                      style={{ backgroundColor: "#001337" }}
                     >
-                      {auto.merk} {auto.model}
-                    </p>
-                    {auto.verkocht && (
-                      <span className="text-[9px] px-1.5 py-0.5 tracking-widest uppercase" style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}>
-                        Verkocht
-                      </span>
-                    )}
-                    {auto.gereserveerd && !auto.verkocht && (
-                      <span className="text-[9px] px-1.5 py-0.5 tracking-widest uppercase" style={{ backgroundColor: "#b45309", color: "#ffffff", fontFamily: "var(--font-inter)" }}>
-                        Gereserveerd
-                      </span>
-                    )}
+                      {auto.fotos?.length > 0 ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={auto.fotos[0]} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-lg font-bold" style={{ color: "rgba(255,255,255,0.15)", fontFamily: "var(--font-playfair)" }}>
+                            {auto.merk.slice(0, 2).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                        <p className="text-sm font-bold" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
+                          {auto.merk} {auto.model}
+                        </p>
+                        {auto.verkocht && (
+                          <span className="text-[9px] px-1.5 py-0.5 tracking-widest uppercase" style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}>Verkocht</span>
+                        )}
+                        {auto.gereserveerd && !auto.verkocht && (
+                          <span className="text-[9px] px-1.5 py-0.5 tracking-widest uppercase" style={{ backgroundColor: "#b45309", color: "#ffffff", fontFamily: "var(--font-inter)" }}>Gereserveerd</span>
+                        )}
+                      </div>
+                      <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
+                        {auto.bouwjaar} · {auto.km.toLocaleString("nl-NL")} km · {auto.brandstof}
+                      </p>
+                    </div>
+                    {/* Prijs — altijd rechts in bovenste rij */}
+                    <div className="text-right flex-shrink-0 md:mr-2">
+                      <p className="text-sm md:text-base font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
+                        €{auto.prijs.toLocaleString("nl-NL")}
+                      </p>
+                      <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
+                        {auto.fotos?.length ?? 0} foto&apos;s
+                      </p>
+                    </div>
                   </div>
-                  <p
-                    className="text-xs"
-                    style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}
-                  >
-                    {auto.bouwjaar} · {auto.km.toLocaleString("nl-NL")} km · {auto.brandstof}
-                  </p>
+                  {/* Onderste rij: knoppen */}
+                  <div className="flex items-center gap-1.5 flex-wrap flex-shrink-0">
+                    {(["beschikbaar", "gereserveerd", "verkocht"] as const).map((s) => {
+                      const active = s === "verkocht" ? auto.verkocht : s === "gereserveerd" ? (auto.gereserveerd && !auto.verkocht) : (!auto.verkocht && !auto.gereserveerd);
+                      return (
+                        <button
+                          key={s}
+                          onClick={() => updateStatus(auto.id, s)}
+                          className="px-2 md:px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase transition-all hover:opacity-80"
+                          style={{
+                            backgroundColor: active ? statusColors[s].bg : "transparent",
+                            color: active ? statusColors[s].color : "rgba(0,19,55,0.3)",
+                            border: `1px solid ${active ? statusColors[s].color : "rgba(0,19,55,0.12)"}`,
+                            fontFamily: "var(--font-inter)",
+                          }}
+                        >
+                          {s === "beschikbaar" ? "Beschikbaar" : s === "gereserveerd" ? "Gereserveerd" : "Verkocht"}
+                        </button>
+                      );
+                    })}
+                    <Link
+                      href={`/aanbod/${auto.slug}`}
+                      target="_blank"
+                      className="px-3 py-1.5 text-xs font-semibold transition-all hover:opacity-70"
+                      style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
+                    >
+                      Bekijk
+                    </Link>
+                    <DeleteButton id={auto.id} naam={`${auto.merk} ${auto.model}`} />
+                  </div>
                 </div>
-                <div className="text-right flex-shrink-0 mr-2">
-                  <p
-                    className="text-base font-bold"
-                    style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}
-                  >
-                    €{auto.prijs.toLocaleString("nl-NL")}
-                  </p>
-                  <p
-                    className="text-[10px]"
-                    style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}
-                  >
-                    {auto.fotos?.length ?? 0} foto's
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {(["beschikbaar", "gereserveerd", "verkocht"] as const).map((s) => {
-                    const active = s === "verkocht" ? auto.verkocht : s === "gereserveerd" ? auto.gereserveerd && !auto.verkocht : !auto.verkocht && !auto.gereserveerd;
-                    const colors: Record<string, { bg: string; color: string }> = {
-                      beschikbaar: { bg: "#dcfce7", color: "#15803d" },
-                      gereserveerd: { bg: "#fef3c7", color: "#b45309" },
-                      verkocht: { bg: "#001337", color: "#ffffff" },
-                    };
-                    return (
-                      <button
-                        key={s}
-                        onClick={() => updateStatus(auto.id, s)}
-                        className="px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase transition-all hover:opacity-80"
-                        style={{
-                          backgroundColor: active ? colors[s].bg : "transparent",
-                          color: active ? colors[s].color : "rgba(0,19,55,0.3)",
-                          border: `1px solid ${active ? colors[s].color : "rgba(0,19,55,0.12)"}`,
-                          fontFamily: "var(--font-inter)",
-                        }}
-                      >
-                        {s === "beschikbaar" ? "Beschikbaar" : s === "gereserveerd" ? "Gereserveerd" : "Verkocht"}
-                      </button>
-                    );
-                  })}
-                  <Link
-                    href={`/aanbod/${auto.slug}`}
-                    target="_blank"
-                    className="px-3 py-1.5 text-xs font-semibold transition-all hover:opacity-70"
-                    style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
-                  >
-                    Bekijk
-                  </Link>
-                  <DeleteButton id={auto.id} naam={`${auto.merk} ${auto.model}`} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -1085,7 +1106,7 @@ function FacturenContent() {
             </button>
           }
         />
-        <div className="p-8" style={{ maxWidth: "720px" }}>
+        <div className="p-4 md:p-8 md:max-w-[720px]">
           {fout && (
             <div className="mb-5 px-4 py-3 text-sm" style={{ backgroundColor: "#fee2e2", border: "1px solid #fecaca", color: "#b91c1c", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}>
               <strong>Fout:</strong> {fout}
@@ -1112,7 +1133,7 @@ function FacturenContent() {
                   </span>
                 )}
               </div>
-              <div className="p-5 grid grid-cols-2 gap-4">
+              <div className="p-4 md:p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {velden.map(({ label, field, col }) => (
                   <div key={field} style={{ gridColumn: col ? `span ${col}` : undefined }}>
                     <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>{label}</label>
@@ -1238,7 +1259,7 @@ function FacturenContent() {
           </button>
         }
       />
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         {nieuwsteFactuur && (
           <div className="mb-5 flex items-center justify-between px-4 py-3" style={{ backgroundColor: "#dcfce7", border: "1px solid #86efac", fontFamily: "var(--font-inter)" }}>
             <div>
@@ -1332,7 +1353,7 @@ function FacturenContent() {
 
                   {isOpen && (
                     <div className="px-5 pb-5" style={{ borderTop: "1px solid rgba(0,19,55,0.06)" }}>
-                      <div className="grid grid-cols-2 gap-6 pt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
                         <div>
                           <p className="text-xs font-bold mb-2 uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
                             Details
@@ -1497,7 +1518,7 @@ function CosignatieContent() {
         title="Cosignatie"
         subtitle={`${aanvragen.length} aanvragen${nieuweAanvragen > 0 ? ` · ${nieuweAanvragen} nieuw` : ""}`}
       />
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <div
@@ -1572,7 +1593,7 @@ function CosignatieContent() {
 
                   {isOpen && (
                     <div className="px-5 pb-5" style={{ borderTop: "1px solid rgba(0,19,55,0.06)" }}>
-                      <div className="grid grid-cols-2 gap-6 pt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
                         <div>
                           <p className="text-xs font-bold mb-2 uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Auto</p>
                           <table className="w-full text-xs" style={{ fontFamily: "var(--font-inter)" }}>
