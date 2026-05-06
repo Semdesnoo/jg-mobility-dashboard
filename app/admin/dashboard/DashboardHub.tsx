@@ -13,11 +13,13 @@ import {
   LogOut,
   Plus,
   ExternalLink,
+  Calculator,
+  Trash2,
 } from "lucide-react";
 import GmailWidget from "./GmailWidget";
 import DeleteButton from "./DeleteButton";
 
-type Tab = "dashboard" | "email" | "voorraad" | "cosignatie" | "social" | "facturen";
+type Tab = "dashboard" | "email" | "voorraad" | "cosignatie" | "social" | "facturen" | "calculator";
 
 type Auto = {
   id: number;
@@ -42,6 +44,7 @@ const NAV: { id: Tab; label: string; icon: React.ComponentType<IconProps> }[] = 
   { id: "cosignatie", label: "Cosignatie", icon: Handshake },
   { id: "social", label: "Social Media", icon: Share2 },
   { id: "facturen", label: "Facturen", icon: FileText },
+  { id: "calculator", label: "Calculator", icon: Calculator },
 ];
 
 function PageHeader({
@@ -283,6 +286,7 @@ export default function DashboardHub() {
           />
         )}
         {tab === "facturen" && <FacturenContent />}
+        {tab === "calculator" && <CalculatorContent />}
       </main>
 
       {/* ── Bottom nav (alleen mobiel) ── */}
@@ -298,6 +302,7 @@ export default function DashboardHub() {
             cosignatie: "Consignatie",
             social: "Social",
             facturen: "Facturen",
+            calculator: "Calc.",
           };
           return (
             <button
@@ -1671,6 +1676,250 @@ function CosignatieContent() {
             })}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ── Marge Calculator ────────────────────────────────────────────
+type KostenRegel = { label: string; bedrag: string };
+
+const STANDAARD_KOSTEN: KostenRegel[] = [
+  { label: "APK keuring", bedrag: "" },
+  { label: "Reparatie / onderhoud", bedrag: "" },
+  { label: "Schoonmaak / polijsten", bedrag: "" },
+];
+
+function CalculatorContent() {
+  const [inkoopprijs, setInkoopprijs] = useState("");
+  const [btwType, setBtwType] = useState<"marge" | "21">("marge");
+  const [verkoopprijs, setVerkoopprijs] = useState("");
+  const [kosten, setKosten] = useState<KostenRegel[]>(STANDAARD_KOSTEN);
+
+  const n = (v: string) => parseFloat(v.replace(",", ".")) || 0;
+  const inkoop = n(inkoopprijs);
+  const verkoop = n(verkoopprijs);
+  const totaalKosten = kosten.reduce((s, k) => s + n(k.bedrag), 0);
+  const totaalKostprijs = inkoop + totaalKosten;
+
+  let nettoWinst = 0, btwAfdracht = 0, breakEven = 0, verkoopExBtw = 0;
+
+  if (btwType === "marge") {
+    const marge = verkoop - totaalKostprijs;
+    if (marge > 0) {
+      btwAfdracht = Math.round(marge * 21 / 121 * 100) / 100;
+      nettoWinst = Math.round((marge - btwAfdracht) * 100) / 100;
+    } else { nettoWinst = marge; }
+    breakEven = totaalKostprijs;
+    verkoopExBtw = verkoop > 0 ? Math.round(verkoop / 1.21 * 100) / 100 : 0;
+  } else {
+    verkoopExBtw = Math.round(verkoop / 1.21 * 100) / 100;
+    btwAfdracht = Math.round((verkoop - verkoopExBtw) * 100) / 100;
+    nettoWinst = Math.round((verkoopExBtw - totaalKostprijs) * 100) / 100;
+    breakEven = Math.round(totaalKostprijs * 1.21 * 100) / 100;
+  }
+
+  const winstPct = totaalKostprijs > 0 && verkoop > 0
+    ? Math.round((nettoWinst / totaalKostprijs) * 1000) / 10 : 0;
+  const fmt = (v: number) => v.toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const winststatus = nettoWinst > 0 ? "winst" : nettoWinst < 0 ? "verlies" : "neutraal";
+
+  const addRegel = () => setKosten((p) => [...p, { label: "", bedrag: "" }]);
+  const removeRegel = (i: number) => setKosten((p) => p.filter((_, j) => j !== i));
+  const updateRegel = (i: number, f: "label" | "bedrag", v: string) =>
+    setKosten((p) => p.map((k, j) => j === i ? { ...k, [f]: v } : k));
+
+  const veld: React.CSSProperties = {
+    border: "1px solid rgba(0,19,55,0.15)", color: "#001337",
+    fontFamily: "var(--font-inter)", backgroundColor: "#fafafa", outline: "none",
+  };
+
+  return (
+    <div>
+      <PageHeader
+        title="Marge Calculator"
+        subtitle="Bereken je winst na BTW en kosten"
+        action={
+          <button onClick={() => { setInkoopprijs(""); setVerkoopprijs(""); setKosten(STANDAARD_KOSTEN); setBtwType("marge"); }}
+            className="text-xs px-4 py-2 transition-all hover:opacity-70"
+            style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}>
+            Reset
+          </button>
+        }
+      />
+      <div className="p-4 md:p-8 flex flex-col lg:flex-row gap-6 lg:items-start">
+
+        {/* Invoer */}
+        <div className="flex-1 flex flex-col gap-4 lg:max-w-[480px]">
+          {/* Inkoop */}
+          <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+            <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Inkoop</p>
+            </div>
+            <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Inkoopprijs (€)</label>
+                <input type="number" value={inkoopprijs} onChange={(e) => setInkoopprijs(e.target.value)}
+                  placeholder="bijv. 8500" className="w-full px-3 py-2.5 text-sm" style={veld} />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>BTW type</label>
+                <select value={btwType} onChange={(e) => setBtwType(e.target.value as "marge" | "21")}
+                  className="w-full px-3 py-2.5 text-sm" style={veld}>
+                  <option value="marge">Margeregeling (particulier)</option>
+                  <option value="21">21% BTW (bedrijf)</option>
+                </select>
+              </div>
+              {btwType === "21" && (
+                <p className="col-span-full text-[10px] leading-relaxed" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
+                  Inkoopprijs excl. BTW invullen, verkoopprijs incl. BTW.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Kosten */}
+          <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+            <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Extra kosten</p>
+            </div>
+            <div className="p-5 flex flex-col gap-3">
+              {kosten.map((k, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                  <input type="text" value={k.label} onChange={(e) => updateRegel(i, "label", e.target.value)}
+                    placeholder="Omschrijving" className="flex-1 px-3 py-2 text-sm" style={veld} />
+                  <div className="relative" style={{ width: "110px" }}>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>€</span>
+                    <input type="number" value={k.bedrag} onChange={(e) => updateRegel(i, "bedrag", e.target.value)}
+                      placeholder="0" className="w-full pl-8 pr-3 py-2 text-sm" style={veld} />
+                  </div>
+                  <button onClick={() => removeRegel(i)} className="flex-shrink-0 p-2 transition-all hover:opacity-60" style={{ color: "rgba(0,19,55,0.3)" }}>
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+              <button onClick={addRegel} className="mt-1 flex items-center gap-1.5 text-xs transition-all hover:opacity-70"
+                style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
+                <Plus size={12} /> Regel toevoegen
+              </button>
+            </div>
+          </div>
+
+          {/* Verkoopprijs */}
+          <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+            <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Gewenste verkoopprijs</p>
+            </div>
+            <div className="p-5">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>€</span>
+                <input type="number" value={verkoopprijs} onChange={(e) => setVerkoopprijs(e.target.value)}
+                  placeholder={breakEven > 0 ? ("Min. " + Math.ceil(breakEven).toLocaleString("nl-NL") + " voor break-even") : "bijv. 11500"}
+                  className="w-full pl-12 pr-3 py-2.5 text-sm" style={veld} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Resultaten */}
+        <div className="lg:w-[320px] flex flex-col gap-3">
+          {/* Kostprijsoverzicht */}
+          <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+            <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Kostprijsoverzicht</p>
+            </div>
+            <div className="p-5">
+              <table className="w-full text-sm" style={{ fontFamily: "var(--font-inter)" }}>
+                <tbody>
+                  <tr>
+                    <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Inkoopprijs</td>
+                    <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{inkoop > 0 ? ("€ " + fmt(inkoop)) : "---"}</td>
+                  </tr>
+                  {kosten.filter(k => n(k.bedrag) > 0).map((k, i) => (
+                    <tr key={i}>
+                      <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>{k.label || "Kosten"}</td>
+                      <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + fmt(n(k.bedrag))}</td>
+                    </tr>
+                  ))}
+                  <tr style={{ borderTop: "1px solid rgba(0,19,55,0.08)" }}>
+                    <td className="pt-3 pb-1 font-bold" style={{ color: "#001337" }}>Totale kostprijs</td>
+                    <td className="pt-3 pb-1 text-right font-bold" style={{ color: "#001337" }}>{totaalKostprijs > 0 ? ("€ " + fmt(totaalKostprijs)) : "---"}</td>
+                  </tr>
+                  {breakEven > 0 && (
+                    <tr>
+                      <td className="py-1" style={{ color: "rgba(0,19,55,0.45)", fontSize: "11px" }}>Break-even verkoopprijs</td>
+                      <td className="py-1 text-right" style={{ color: "rgba(0,19,55,0.45)", fontSize: "11px" }}>{"€ " + fmt(breakEven)}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Resultaat */}
+          {verkoop > 0 && (
+            <div style={{
+              backgroundColor: winststatus === "winst" ? "#f0fdf4" : winststatus === "verlies" ? "#fef2f2" : "#f8fafc",
+              border: ("1px solid " + (winststatus === "winst" ? "#86efac" : winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.07)")),
+            }}>
+              <div className="px-5 py-3" style={{
+                borderBottom: ("1px solid " + (winststatus === "winst" ? "#bbf7d0" : winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.06)")),
+                backgroundColor: winststatus === "winst" ? "rgba(21,128,61,0.05)" : winststatus === "verlies" ? "rgba(185,28,28,0.04)" : "rgba(0,19,55,0.02)",
+              }}>
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Resultaat</p>
+              </div>
+              <div className="p-5">
+                <table className="w-full text-sm" style={{ fontFamily: "var(--font-inter)" }}>
+                  <tbody>
+                    <tr>
+                      <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Verkoopprijs</td>
+                      <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + fmt(verkoop)}</td>
+                    </tr>
+                    {btwType === "marge" && verkoop > 0 && (
+                      <tr>
+                        <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Bruto marge</td>
+                        <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + fmt(verkoop - totaalKostprijs)}</td>
+                      </tr>
+                    )}
+                    {btwType === "21" && (
+                      <tr>
+                        <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Excl. BTW</td>
+                        <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + fmt(verkoopExBtw)}</td>
+                      </tr>
+                    )}
+                    <tr>
+                      <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>{btwType === "marge" ? "BTW afdragen (op marge)" : "BTW afdragen (21%)"}</td>
+                      <td className="py-1.5 text-right font-semibold" style={{ color: btwAfdracht > 0 ? "#b45309" : "rgba(0,19,55,0.55)" }}>
+                        {btwAfdracht > 0 ? ("- "€ " + fmt(btwAfdracht)) : "€ 0,00"}
+                      </td>
+                    </tr>
+                    <tr style={{ borderTop: ("2px solid " + (winststatus === "winst" ? "#86efac" : winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.12)")) }}>
+                      <td className="pt-3 font-bold text-base" style={{ color: "#001337" }}>Netto winst</td>
+                      <td className="pt-3 text-right font-bold text-base" style={{ color: winststatus === "winst" ? "#15803d" : winststatus === "verlies" ? "#b91c1c" : "#001337" }}>
+                        {(nettoWinst >= 0 ? "" : "- ") + "€ " + fmt(Math.abs(nettoWinst))}
+                      </td>
+                    </tr>
+                    {winstPct !== 0 && (
+                      <tr>
+                        <td style={{ color: "rgba(0,19,55,0.4)", fontSize: "11px" }}>Winstmarge</td>
+                        <td className="text-right" style={{ color: winstPct > 0 ? "#15803d" : "#b91c1c", fontSize: "11px", fontWeight: 600 }}>
+                          {(winstPct > 0 ? "+" : "") + winstPct + "%"}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {totaalKostprijs > 0 && verkoop === 0 && (
+            <div className="px-4 py-3 text-xs" style={{ backgroundColor: "rgba(0,19,55,0.03)", border: "1px solid rgba(0,19,55,0.07)", color: "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)", lineHeight: 1.7 }}>
+              Vul een verkoopprijs in om je winst te berekenen.<br />
+              <strong style={{ color: "#001337" }}>{"Break-even: "€ " + fmt(breakEven)}</strong>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
