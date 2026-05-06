@@ -270,9 +270,8 @@ export default function DashboardHub() {
             autos={autos}
             beschikbaar={beschikbaar}
             verkocht={verkocht}
-            gemPrijs={gemPrijs}
             lastRefresh={lastRefresh}
-            goVoorraad={() => setTab("voorraad")}
+            refresh={refresh}
           />
         )}
         {tab === "email" && <EmailContent />}
@@ -334,18 +333,26 @@ function DashboardContent({
   autos,
   beschikbaar,
   verkocht,
-  gemPrijs,
   lastRefresh,
-  goVoorraad,
+  refresh,
 }: {
   autos: Auto[];
   beschikbaar: Auto[];
   verkocht: Auto[];
-  gemPrijs: number;
   lastRefresh: Date;
-  goVoorraad: () => void;
+  refresh: () => void;
 }) {
   const totaalWaarde = beschikbaar.reduce((s, a) => s + a.prijs, 0);
+
+  const updateStatus = async (id: number, status: "beschikbaar" | "gereserveerd" | "verkocht") => {
+    await fetch(`/api/admin/autos/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    refresh();
+  };
+
   return (
     <div>
       <PageHeader
@@ -359,11 +366,7 @@ function DashboardContent({
             href="/aanbod"
             target="_blank"
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold transition-all hover:opacity-70"
-            style={{
-              border: "1px solid rgba(0,19,55,0.15)",
-              color: "#001337",
-              fontFamily: "var(--font-inter)",
-            }}
+            style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
           >
             <ExternalLink size={12} /> Website
           </Link>
@@ -382,100 +385,140 @@ function DashboardContent({
           />
         </div>
 
-        {/* Gmail */}
-        <div>
+        {/* Mail (links) + Calculator (rechts) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-start">
           <GmailWidget />
-        </div>
-
-        {/* Recente auto's */}
-        {autos.length > 0 && (
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3
-                className="text-sm font-bold"
-                style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}
-              >
-                Recente voertuigen
-              </h3>
-              <button
-                onClick={goVoorraad}
-                className="text-xs font-medium transition-all hover:opacity-60"
-                style={{ color: "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)" }}
-              >
-                Bekijk alle →
-              </button>
+          <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+            <div
+              className="px-5 py-4 flex items-center gap-2"
+              style={{ borderBottom: "1px solid rgba(0,19,55,0.07)" }}
+            >
+              <Calculator size={15} style={{ color: "#001337" }} />
+              <h2 className="text-sm font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
+                Marge Calculator
+              </h2>
             </div>
-            <div className="flex flex-col gap-2">
-              {autos.slice(0, 4).map((auto) => (
-                <div
-                  key={auto.id}
-                  className="flex items-center gap-4 px-4 py-3"
-                  style={{
-                    backgroundColor: "#ffffff",
-                    border: "1px solid rgba(0,19,55,0.07)",
-                  }}
-                >
-                  <div
-                    className="w-14 h-10 flex-shrink-0 overflow-hidden"
-                    style={{ backgroundColor: "#001337" }}
-                  >
-                    {auto.fotos?.length > 0 ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={auto.fotos[0]} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span
-                          className="text-xs font-bold"
-                          style={{
-                            color: "rgba(255,255,255,0.2)",
-                            fontFamily: "var(--font-playfair)",
-                          }}
-                        >
-                          {auto.merk.slice(0, 2).toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p
-                      className="text-sm font-semibold truncate"
-                      style={{ color: "#001337", fontFamily: "var(--font-inter)" }}
-                    >
-                      {auto.merk} {auto.model}{" "}
-                      <span style={{ color: "rgba(0,19,55,0.4)", fontWeight: 400 }}>
-                        {auto.bouwjaar}
-                      </span>
-                    </p>
-                    <p
-                      className="text-xs"
-                      style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}
-                    >
-                      {auto.km.toLocaleString("nl-NL")} km · {auto.brandstof}
-                    </p>
-                  </div>
-                  <p
-                    className="text-sm font-bold flex-shrink-0"
-                    style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}
-                  >
-                    €{auto.prijs.toLocaleString("nl-NL")}
-                  </p>
-                  {auto.verkocht && (
-                    <span
-                      className="text-[9px] px-1.5 py-0.5 tracking-widest uppercase flex-shrink-0"
-                      style={{
-                        backgroundColor: "#001337",
-                        color: "#ffffff",
-                        fontFamily: "var(--font-inter)",
-                      }}
-                    >
-                      Verkocht
-                    </span>
-                  )}
-                </div>
-              ))}
+            <div className="p-4">
+              <CalculatorPanel />
             </div>
           </div>
-        )}
+        </div>
+
+        {/* Voorraad — volle breedte */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-bold" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
+              Voorraad
+            </h3>
+            <Link
+              href="/admin/auto-toevoegen"
+              className="flex items-center gap-1.5 text-xs font-medium transition-all hover:opacity-60"
+              style={{ color: "#001337", fontFamily: "var(--font-inter)" }}
+            >
+              <Plus size={11} /> Nieuwe auto
+            </Link>
+          </div>
+          {autos.length === 0 ? (
+            <div
+              className="flex flex-col items-center justify-center py-16"
+              style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}
+            >
+              <Car size={32} style={{ color: "rgba(0,19,55,0.1)" }} />
+              <p className="text-sm font-bold mt-4" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
+                Nog geen auto&apos;s
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {autos.map((auto) => {
+                const statusColors: Record<string, { bg: string; color: string }> = {
+                  beschikbaar: { bg: "#dcfce7", color: "#15803d" },
+                  gereserveerd: { bg: "#fef3c7", color: "#b45309" },
+                  verkocht: { bg: "#001337", color: "#ffffff" },
+                };
+                return (
+                  <div
+                    key={auto.id}
+                    className="flex flex-col md:flex-row md:items-center gap-2.5 md:gap-4 px-4 md:px-5 py-3.5"
+                    style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex-shrink-0 w-16 md:w-20 h-11 md:h-14 overflow-hidden" style={{ backgroundColor: "#001337" }}>
+                        {auto.fotos?.length > 0 ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={auto.fotos[0]} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-lg font-bold" style={{ color: "rgba(255,255,255,0.15)", fontFamily: "var(--font-playfair)" }}>
+                              {auto.merk.slice(0, 2).toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                          <p className="text-sm font-bold" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
+                            {auto.merk} {auto.model}
+                          </p>
+                          {auto.verkocht && (
+                            <span className="text-[9px] px-1.5 py-0.5 tracking-widest uppercase" style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}>
+                              Verkocht
+                            </span>
+                          )}
+                          {auto.gereserveerd && !auto.verkocht && (
+                            <span className="text-[9px] px-1.5 py-0.5 tracking-widest uppercase" style={{ backgroundColor: "#b45309", color: "#ffffff", fontFamily: "var(--font-inter)" }}>
+                              Gereserveerd
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
+                          {auto.bouwjaar} · {auto.km.toLocaleString("nl-NL")} km · {auto.brandstof}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0 md:mr-2">
+                        <p className="text-sm md:text-base font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
+                          €{auto.prijs.toLocaleString("nl-NL")}
+                        </p>
+                        <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
+                          {auto.fotos?.length ?? 0} foto&apos;s
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-wrap flex-shrink-0">
+                      {(["beschikbaar", "gereserveerd", "verkocht"] as const).map((s) => {
+                        const active = s === "verkocht" ? auto.verkocht : s === "gereserveerd" ? (auto.gereserveerd && !auto.verkocht) : (!auto.verkocht && !auto.gereserveerd);
+                        return (
+                          <button
+                            key={s}
+                            onClick={() => updateStatus(auto.id, s)}
+                            className="px-2 md:px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase transition-all hover:opacity-80"
+                            style={{
+                              backgroundColor: active ? statusColors[s].bg : "transparent",
+                              color: active ? statusColors[s].color : "rgba(0,19,55,0.3)",
+                              border: `1px solid ${active ? statusColors[s].color : "rgba(0,19,55,0.12)"}`,
+                              fontFamily: "var(--font-inter)",
+                            }}
+                          >
+                            {s === "beschikbaar" ? "Beschikbaar" : s === "gereserveerd" ? "Gereserveerd" : "Verkocht"}
+                          </button>
+                        );
+                      })}
+                      <Link
+                        href={`/aanbod/${auto.slug}`}
+                        target="_blank"
+                        className="px-3 py-1.5 text-xs font-semibold transition-all hover:opacity-70"
+                        style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
+                      >
+                        Bekijk
+                      </Link>
+                      <DeleteButton id={auto.id} naam={`${auto.merk} ${auto.model}`} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -1690,7 +1733,7 @@ const STANDAARD_KOSTEN: KostenRegel[] = [
   { label: "Schoonmaak / polijsten", bedrag: "" },
 ];
 
-function CalculatorContent() {
+function CalculatorPanel() {
   const [inkoopprijs, setInkoopprijs] = useState("");
   const [btwType, setBtwType] = useState<"marge" | "21">("marge");
   const [verkoopprijs, setVerkoopprijs] = useState("");
@@ -1734,23 +1777,13 @@ function CalculatorContent() {
     fontFamily: "var(--font-inter)", backgroundColor: "#fafafa", outline: "none",
   };
 
-  return (
-    <div>
-      <PageHeader
-        title="Marge Calculator"
-        subtitle="Bereken je winst na BTW en kosten"
-        action={
-          <button onClick={() => { setInkoopprijs(""); setVerkoopprijs(""); setKosten(STANDAARD_KOSTEN); setBtwType("marge"); }}
-            className="text-xs px-4 py-2 transition-all hover:opacity-70"
-            style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}>
-            Reset
-          </button>
-        }
-      />
-      <div className="p-4 md:p-8 flex flex-col lg:flex-row gap-6 lg:items-start">
+  const reset = () => { setInkoopprijs(""); setVerkoopprijs(""); setKosten(STANDAARD_KOSTEN); setBtwType("marge"); };
 
-        {/* Invoer */}
-        <div className="flex-1 flex flex-col gap-4 lg:max-w-[480px]">
+  return (
+    <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
+
+      {/* Invoer */}
+      <div className="flex-1 flex flex-col gap-4 lg:max-w-[480px]">
           {/* Inkoop */}
           <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
             <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
@@ -1920,6 +1953,16 @@ function CalculatorContent() {
             </div>
           )}
         </div>
+      </div>
+  );
+}
+
+function CalculatorContent() {
+  return (
+    <div>
+      <PageHeader title="Marge Calculator" subtitle="Bereken je winst na BTW en kosten" />
+      <div className="p-4 md:p-8">
+        <CalculatorPanel />
       </div>
     </div>
   );
