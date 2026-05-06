@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -33,6 +33,18 @@ type Auto = {
   verkocht: boolean;
   gereserveerd?: boolean;
   fotos: string[];
+};
+
+type KostenRegel = { label: string; bedrag: string };
+
+type Dossier = {
+  id: number;
+  auto_naam: string;
+  inkoop: number;
+  btw_type: "marge" | "21";
+  verkoopprijs: number;
+  kosten: KostenRegel[];
+  aangemaakt: string;
 };
 
 type IconProps = { size?: number; style?: React.CSSProperties; className?: string };
@@ -189,7 +201,7 @@ export default function DashboardHub() {
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "#f0f2f5" }}>
-      {/* ── Zijbalk (alleen desktop) ── */}
+      {/* â”€â”€ Zijbalk (alleen desktop) â”€â”€ */}
       <aside
         className="hidden md:flex flex-col flex-shrink-0"
         style={{ width: "220px", backgroundColor: "#001337", height: "100vh" }}
@@ -241,7 +253,7 @@ export default function DashboardHub() {
             <RefreshCw size={10} className={refreshing ? "animate-spin" : ""} />
             {refreshing
               ? "Verversen..."
-              : `${countdown}s · ${lastRefresh.toLocaleTimeString("nl-NL", {
+              : `${countdown}s Â· ${lastRefresh.toLocaleTimeString("nl-NL", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}`}
@@ -263,7 +275,7 @@ export default function DashboardHub() {
         </div>
       </aside>
 
-      {/* ── Hoofdinhoud ── */}
+      {/* â”€â”€ Hoofdinhoud â”€â”€ */}
       <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
         {tab === "dashboard" && (
           <DashboardContent
@@ -288,7 +300,7 @@ export default function DashboardHub() {
         {tab === "calculator" && <CalculatorContent />}
       </main>
 
-      {/* ── Bottom nav (alleen mobiel) ── */}
+      {/* â”€â”€ Bottom nav (alleen mobiel) â”€â”€ */}
       <nav
         className="fixed bottom-0 left-0 right-0 md:hidden flex z-50"
         style={{ backgroundColor: "#001337", borderTop: "1px solid rgba(255,255,255,0.08)", height: "60px" }}
@@ -328,7 +340,7 @@ export default function DashboardHub() {
   );
 }
 
-// ── Dashboard overzicht ─────────────────────────────────────────
+// â”€â”€ Dashboard overzicht â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function DashboardContent({
   autos,
   beschikbaar,
@@ -381,7 +393,7 @@ function DashboardContent({
           <StatCard label="Totaal voertuigen" value={autos.length} />
           <StatCard
             label="Totale voorraadwaarde"
-            value={totaalWaarde ? `€${totaalWaarde.toLocaleString("nl-NL")}` : "—"}
+            value={totaalWaarde ? `â‚¬${totaalWaarde.toLocaleString("nl-NL")}` : "â€”"}
           />
         </div>
 
@@ -404,7 +416,7 @@ function DashboardContent({
           </div>
         </div>
 
-        {/* Voorraad — volle breedte */}
+        {/* Voorraad â€” volle breedte */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-bold" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
@@ -472,12 +484,12 @@ function DashboardContent({
                           )}
                         </div>
                         <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
-                          {auto.bouwjaar} · {auto.km.toLocaleString("nl-NL")} km · {auto.brandstof}
+                          {auto.bouwjaar} Â· {auto.km.toLocaleString("nl-NL")} km Â· {auto.brandstof}
                         </p>
                       </div>
                       <div className="text-right flex-shrink-0 md:mr-2">
                         <p className="text-sm md:text-base font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
-                          €{auto.prijs.toLocaleString("nl-NL")}
+                          â‚¬{auto.prijs.toLocaleString("nl-NL")}
                         </p>
                         <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
                           {auto.fotos?.length ?? 0} foto&apos;s
@@ -524,7 +536,7 @@ function DashboardContent({
   );
 }
 
-// ── Email ───────────────────────────────────────────────────────
+// â”€â”€ Email â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function EmailContent() {
   return (
     <div>
@@ -550,7 +562,7 @@ function EmailContent() {
   );
 }
 
-// ── Auto Voorraad ───────────────────────────────────────────────
+// â”€â”€ Auto Voorraad â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => void }) {
   const beschikbaar = autos.filter((a) => !a.verkocht);
   const verkocht = autos.filter((a) => a.verkocht);
@@ -568,7 +580,7 @@ function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => voi
     <div>
       <PageHeader
         title="Auto Voorraad"
-        subtitle={`${beschikbaar.length} beschikbaar · ${verkocht.length} verkocht`}
+        subtitle={`${beschikbaar.length} beschikbaar Â· ${verkocht.length} verkocht`}
         action={
           <Link
             href="/admin/auto-toevoegen"
@@ -648,13 +660,13 @@ function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => voi
                         )}
                       </div>
                       <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
-                        {auto.bouwjaar} · {auto.km.toLocaleString("nl-NL")} km · {auto.brandstof}
+                        {auto.bouwjaar} Â· {auto.km.toLocaleString("nl-NL")} km Â· {auto.brandstof}
                       </p>
                     </div>
-                    {/* Prijs — altijd rechts in bovenste rij */}
+                    {/* Prijs â€” altijd rechts in bovenste rij */}
                     <div className="text-right flex-shrink-0 md:mr-2">
                       <p className="text-sm md:text-base font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
-                        €{auto.prijs.toLocaleString("nl-NL")}
+                        â‚¬{auto.prijs.toLocaleString("nl-NL")}
                       </p>
                       <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
                         {auto.fotos?.length ?? 0} foto&apos;s
@@ -701,7 +713,7 @@ function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => voi
   );
 }
 
-// ── Facturen ────────────────────────────────────────────────────
+// â”€â”€ Facturen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type FactuurRegel = { omschrijving: string; prijs: string };
 
 type Factuur = {
@@ -780,15 +792,15 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
   const regelRijen = [
     `<tr>
       <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;color:#1e293b;font-size:10pt">${autoOmschrijving}${autoKenteken}</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">â‚¬&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
       <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt;width:60px">1</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">â‚¬&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
     </tr>`,
     ...extraRegels.map((r) => `<tr>
       <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;color:#1e293b;font-size:10pt">${r.omschrijving}</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">â‚¬&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
       <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">1</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">â‚¬&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
     </tr>`),
   ].join("");
 
@@ -857,7 +869,7 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
         </div>
       </td>
       <td style="vertical-align:top;padding-left:120px;width:50%">
-        <div style="font-size:11pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;margin-bottom:6px">${f.klant_naam || "—"}</div>
+        <div style="font-size:11pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;margin-bottom:6px">${f.klant_naam || "â€”"}</div>
         <div style="font-size:9.5pt;color:#475569;line-height:1.75">
           ${f.klant_adres ? f.klant_adres + "<br>" : ""}
           ${[f.klant_postcode, f.klant_stad].filter(Boolean).join(" ")}${(f.klant_postcode || f.klant_stad) ? "<br>" : ""}
@@ -887,23 +899,23 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
   <table style="width:270px;margin-left:auto;margin-bottom:30px;margin-top:10px">
     <tr>
       <td style="font-size:9.5pt;color:#64748b;padding:4px 0">Subtotaal</td>
-      <td style="font-size:9.5pt;color:#64748b;text-align:right;padding:4px 0">€&nbsp;${subtotaal.toLocaleString("nl-NL")}</td>
+      <td style="font-size:9.5pt;color:#64748b;text-align:right;padding:4px 0">â‚¬&nbsp;${subtotaal.toLocaleString("nl-NL")}</td>
     </tr>
     ${f.btw_type === "21"
       ? `<tr>
           <td style="font-size:9.5pt;color:#1d4ed8;padding:4px 0;border-bottom:1px solid #e2e8f0">BTW (21%)</td>
-          <td style="font-size:9.5pt;color:#1d4ed8;text-align:right;padding:4px 0;border-bottom:1px solid #e2e8f0">€&nbsp;${btwBedrag.toLocaleString("nl-NL")}</td>
+          <td style="font-size:9.5pt;color:#1d4ed8;text-align:right;padding:4px 0;border-bottom:1px solid #e2e8f0">â‚¬&nbsp;${btwBedrag.toLocaleString("nl-NL")}</td>
         </tr>`
       : `<tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;padding:3px 0"></td></tr>`}
     <tr>
       <td style="font-size:12pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;padding:9px 0 0">Eindtotaal</td>
-      <td style="font-size:12pt;font-weight:700;color:#001337;text-align:right;padding:9px 0 0">€&nbsp;${eindtotaal.toLocaleString("nl-NL")}</td>
+      <td style="font-size:12pt;font-weight:700;color:#001337;text-align:right;padding:9px 0 0">â‚¬&nbsp;${eindtotaal.toLocaleString("nl-NL")}</td>
     </tr>
   </table>
 
   <!-- Betaaltekst -->
   <div style="font-size:9pt;color:#475569;line-height:1.85;border-top:1px solid #e2e8f0;padding-top:16px;margin-bottom:12px">
-    Wij vragen u vriendelijk het bedrag van €${eindtotaal.toLocaleString("nl-NL")} ${f.vervaldatum ? `voor ${f.vervaldatum}` : "binnen 30 dagen na ontvangst"} over te maken
+    Wij vragen u vriendelijk het bedrag van â‚¬${eindtotaal.toLocaleString("nl-NL")} ${f.vervaldatum ? `voor ${f.vervaldatum}` : "binnen 30 dagen na ontvangst"} over te maken
     ${f.betaalwijze === "bank" ? "op rekening (IBAN volgt) onder vermelding van factuurnummer <strong>" + f.factuur_nr + "</strong>" : "te voldoen per contant"}.
     <br>Factuur uitgereikt door JG MOBILITY.
     ${f.btw_type === "marge" ? `<br><span style="font-size:8pt;color:#94a3b8">Op dit voertuig is de margeregeling van toepassing. BTW is niet afzonderlijk vermeld (art. 28b t/m 28h Wet OB 1968).</span>` : ""}
@@ -1111,7 +1123,7 @@ function FacturenContent() {
     fontFamily: "var(--font-inter)",
   };
 
-  // ── Nieuwe factuur ──────────────────────────────────────────
+  // â”€â”€ Nieuwe factuur â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (view === "nieuw") {
     const secties: { titel: string; velden: { label: string; field: keyof FactuurForm; col?: number }[] }[] = [
       {
@@ -1143,14 +1155,14 @@ function FacturenContent() {
       <div>
         <PageHeader
           title={bewerkFactuur ? `Bewerken: ${bewerkFactuur.factuur_nr}` : "Nieuwe factuur"}
-          subtitle={bewerkFactuur ? "Wijzig de gegevens en sla op — factuurnummer blijft ongewijzigd" : "Vul de gegevens in en genereer de factuur"}
+          subtitle={bewerkFactuur ? "Wijzig de gegevens en sla op â€” factuurnummer blijft ongewijzigd" : "Vul de gegevens in en genereer de factuur"}
           action={
             <button
               onClick={() => { setView("lijst"); setForm(LEEG_FORM); setRegels(LEEG_REGELS); setBewerkFactuur(null); }}
               className="text-xs px-4 py-2 transition-all hover:opacity-70"
               style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
             >
-              ← Annuleer
+              â† Annuleer
             </button>
           }
         />
@@ -1172,7 +1184,7 @@ function FacturenContent() {
                 )}
                 {titel === "Voertuig" && !rdwLaden && rdwStatus === "gevonden" && (
                   <span className="text-[10px]" style={{ color: "#15803d", fontFamily: "var(--font-inter)" }}>
-                    ✓ Gevonden via RDW
+                    âœ“ Gevonden via RDW
                   </span>
                 )}
                 {titel === "Voertuig" && !rdwLaden && rdwStatus === "niet_gevonden" && (
@@ -1199,7 +1211,7 @@ function FacturenContent() {
             </div>
             <div className="p-5 grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Verkoopprijs (€)</label>
+                <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Verkoopprijs (â‚¬)</label>
                 <input type="number" {...inp("verkoopprijs")} className="w-full px-3 py-2 text-sm outline-none" style={veldStijl} />
               </div>
               <div>
@@ -1230,7 +1242,7 @@ function FacturenContent() {
           {/* Extra regels */}
           <div className="mb-5" style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
             <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-wider" style={labelStijl}>Extra regels (optioneel — bv. banden, garantie)</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider" style={labelStijl}>Extra regels (optioneel â€” bv. banden, garantie)</p>
             </div>
             <div className="p-5 flex flex-col gap-3">
               {regels.map((r, i) => (
@@ -1247,7 +1259,7 @@ function FacturenContent() {
                     />
                   </div>
                   <div style={{ width: "130px" }}>
-                    {i === 0 && <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Prijs (€)</label>}
+                    {i === 0 && <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Prijs (â‚¬)</label>}
                     <input
                       type="number"
                       value={r.prijs}
@@ -1291,7 +1303,7 @@ function FacturenContent() {
     );
   }
 
-  // ── Lijstweergave ───────────────────────────────────────────
+  // â”€â”€ Lijstweergave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <div>
       <PageHeader
@@ -1329,7 +1341,7 @@ function FacturenContent() {
                 className="px-3 py-2 text-xs"
                 style={{ color: "#15803d", border: "1px solid #86efac", fontFamily: "var(--font-inter)" }}
               >
-                ✕
+                âœ•
               </button>
             </div>
           </div>
@@ -1372,7 +1384,7 @@ function FacturenContent() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <p className="text-sm font-bold" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
-                          {f.factuur_nr} · {f.klant_naam || "Naamloos"}
+                          {f.factuur_nr} Â· {f.klant_naam || "Naamloos"}
                         </p>
                         <span
                           className="text-[10px] px-2 py-0.5 font-semibold"
@@ -1383,19 +1395,19 @@ function FacturenContent() {
                       </div>
                       <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
                         {[f.auto_merk, f.auto_model, f.auto_bouwjaar].filter(Boolean).join(" ")}
-                        {f.auto_kenteken ? ` · ${f.auto_kenteken.toUpperCase()}` : ""}
+                        {f.auto_kenteken ? ` Â· ${f.auto_kenteken.toUpperCase()}` : ""}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-sm font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
-                        €{Number(f.verkoopprijs).toLocaleString("nl-NL")}
+                        â‚¬{Number(f.verkoopprijs).toLocaleString("nl-NL")}
                       </p>
                       <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
-                        {f.datum} · {f.btw_type === "marge" ? "Marge" : "21% BTW"}
+                        {f.datum} Â· {f.btw_type === "marge" ? "Marge" : "21% BTW"}
                       </p>
                     </div>
                     <span className="text-xs ml-2 flex-shrink-0" style={{ color: "rgba(0,19,55,0.3)" }}>
-                      {isOpen ? "▲" : "▼"}
+                      {isOpen ? "â–²" : "â–¼"}
                     </span>
                   </button>
 
@@ -1490,7 +1502,7 @@ function FacturenContent() {
   );
 }
 
-// ── Cosignatie ──────────────────────────────────────────────────
+// â”€â”€ Cosignatie â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type Cosignatie = {
   id: string;
   datum: string;
@@ -1564,7 +1576,7 @@ function CosignatieContent() {
     <div>
       <PageHeader
         title="Cosignatie"
-        subtitle={`${aanvragen.length} aanvragen${nieuweAanvragen > 0 ? ` · ${nieuweAanvragen} nieuw` : ""}`}
+        subtitle={`${aanvragen.length} aanvragen${nieuweAanvragen > 0 ? ` Â· ${nieuweAanvragen} nieuw` : ""}`}
       />
       <div className="p-4 md:p-8">
         {loading ? (
@@ -1621,21 +1633,21 @@ function CosignatieContent() {
                         </span>
                       </div>
                       <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
-                        {a.naam} · {a.email}{a.telefoon ? ` · ${a.telefoon}` : ""}
+                        {a.naam} Â· {a.email}{a.telefoon ? ` Â· ${a.telefoon}` : ""}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       {a.vraagprijs && (
                         <p className="text-sm font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
-                          €{parseInt(a.vraagprijs).toLocaleString("nl-NL")}
+                          â‚¬{parseInt(a.vraagprijs).toLocaleString("nl-NL")}
                         </p>
                       )}
                       <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
-                        {a.datum} · {a.tijd}{a.aantal_fotos > 0 ? ` · ${a.aantal_fotos} foto's` : ""}
+                        {a.datum} Â· {a.tijd}{a.aantal_fotos > 0 ? ` Â· ${a.aantal_fotos} foto's` : ""}
                       </p>
                     </div>
                     <span className="text-xs ml-2 flex-shrink-0" style={{ color: "rgba(0,19,55,0.3)" }}>
-                      {isOpen ? "▲" : "▼"}
+                      {isOpen ? "â–²" : "â–¼"}
                     </span>
                   </button>
 
@@ -1649,8 +1661,8 @@ function CosignatieContent() {
                               {[
                                 ["Merk & Model", `${a.merk} ${a.model}`],
                                 ["Bouwjaar", a.bouwjaar],
-                                ["Kilometerstand", a.km ? `${parseInt(a.km).toLocaleString("nl-NL")} km` : "—"],
-                                ["Vraagprijs", a.vraagprijs ? `€${parseInt(a.vraagprijs).toLocaleString("nl-NL")}` : "—"],
+                                ["Kilometerstand", a.km ? `${parseInt(a.km).toLocaleString("nl-NL")} km` : "â€”"],
+                                ["Vraagprijs", a.vraagprijs ? `â‚¬${parseInt(a.vraagprijs).toLocaleString("nl-NL")}` : "â€”"],
                               ].map(([label, val]) => (
                                 <tr key={label}>
                                   <td className="py-1 pr-3" style={{ color: "rgba(0,19,55,0.45)", width: "110px" }}>{label}</td>
@@ -1724,21 +1736,85 @@ function CosignatieContent() {
   );
 }
 
-// ── Marge Calculator ────────────────────────────────────────────
-type KostenRegel = { label: string; bedrag: string };
-
+// â”€â”€ Marge Calculator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const STANDAARD_KOSTEN: KostenRegel[] = [
   { label: "APK keuring", bedrag: "" },
   { label: "Reparatie / onderhoud", bedrag: "" },
   { label: "Schoonmaak / polijsten", bedrag: "" },
 ];
 
+// Dashboard-widget: compact dossier overzicht
 function CalculatorPanel() {
-  const [inkoopprijs, setInkoopprijs] = useState("");
-  const [btwType, setBtwType] = useState<"marge" | "21">("marge");
-  const [verkoopprijs, setVerkoopprijs] = useState("");
-  const [kosten, setKosten] = useState<KostenRegel[]>(STANDAARD_KOSTEN);
+  const [dossiers, setDossiers] = useState<Dossier[]>([]);
 
+  useEffect(() => {
+    fetch("/api/admin/dossiers")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setDossiers);
+  }, []);
+
+  const fmtK = (v: number) => v.toLocaleString("nl-NL", { maximumFractionDigits: 0 });
+
+  const calcWinst = (d: Dossier): number | null => {
+    const k = d.inkoop + d.kosten.reduce((s, kk) => s + (parseFloat(kk.bedrag) || 0), 0);
+    if (d.verkoopprijs <= 0) return null;
+    if (d.btw_type === "marge") {
+      const m = d.verkoopprijs - k;
+      return m > 0 ? Math.round((m - (m * 21) / 121) * 100) / 100 : m;
+    }
+    const ex = Math.round((d.verkoopprijs / 1.21) * 100) / 100;
+    return Math.round((ex - k) * 100) / 100;
+  };
+
+  if (dossiers.length === 0) {
+    return (
+      <div className="py-6 text-center">
+        <p className="text-sm" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
+          Nog geen dossiers â€” open de Calculator tab om te starten.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {dossiers.map((d) => {
+        const w = calcWinst(d);
+        return (
+          <div
+            key={d.id}
+            className="flex items-center justify-between px-4 py-3"
+            style={{ border: "1px solid rgba(0,19,55,0.07)", backgroundColor: "#fafbfc" }}
+          >
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold truncate" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
+                {d.auto_naam || "Naamloos"}
+              </p>
+              <p className="text-[10px] mt-0.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
+                {d.inkoop > 0 ? ("Inkoop: â‚¬" + fmtK(d.inkoop)) : "Inkoop: â€”"}
+                {" Â· "}
+                {d.btw_type === "marge" ? "Marge" : "21% BTW"}
+              </p>
+            </div>
+            <div className="flex-shrink-0 text-right ml-3">
+              {w !== null ? (
+                <p className="text-sm font-bold" style={{ color: w > 0 ? "#15803d" : w < 0 ? "#b91c1c" : "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)" }}>
+                  {w > 0 ? "+" : ""}
+                  {"â‚¬" + fmtK(Math.abs(w))}
+                </p>
+              ) : (
+                <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.3)", fontFamily: "var(--font-inter)" }}>Geen verkoop</p>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// â”€â”€ Interne helpers voor de calculators â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function useCalculatorLogic(inkoopprijs: string, btwType: "marge" | "21", verkoopprijs: string, kosten: KostenRegel[]) {
   const n = (v: string) => parseFloat(v.replace(",", ".")) || 0;
   const inkoop = n(inkoopprijs);
   const verkoop = n(verkoopprijs);
@@ -1750,13 +1826,13 @@ function CalculatorPanel() {
   if (btwType === "marge") {
     const marge = verkoop - totaalKostprijs;
     if (marge > 0) {
-      btwAfdracht = Math.round(marge * 21 / 121 * 100) / 100;
+      btwAfdracht = Math.round((marge * 21) / 121 * 100) / 100;
       nettoWinst = Math.round((marge - btwAfdracht) * 100) / 100;
     } else { nettoWinst = marge; }
     breakEven = totaalKostprijs;
-    verkoopExBtw = verkoop > 0 ? Math.round(verkoop / 1.21 * 100) / 100 : 0;
+    verkoopExBtw = verkoop > 0 ? Math.round((verkoop / 1.21) * 100) / 100 : 0;
   } else {
-    verkoopExBtw = Math.round(verkoop / 1.21 * 100) / 100;
+    verkoopExBtw = Math.round((verkoop / 1.21) * 100) / 100;
     btwAfdracht = Math.round((verkoop - verkoopExBtw) * 100) / 100;
     nettoWinst = Math.round((verkoopExBtw - totaalKostprijs) * 100) / 100;
     breakEven = Math.round(totaalKostprijs * 1.21 * 100) / 100;
@@ -1765,204 +1841,460 @@ function CalculatorPanel() {
   const winstPct = totaalKostprijs > 0 && verkoop > 0
     ? Math.round((nettoWinst / totaalKostprijs) * 1000) / 10 : 0;
   const fmt = (v: number) => v.toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const winststatus = nettoWinst > 0 ? "winst" : nettoWinst < 0 ? "verlies" : "neutraal";
+  const winststatus: "winst" | "verlies" | "neutraal" = nettoWinst > 0 ? "winst" : nettoWinst < 0 ? "verlies" : "neutraal";
+
+  return { inkoop, verkoop, totaalKostprijs, nettoWinst, btwAfdracht, breakEven, verkoopExBtw, winstPct, fmt, winststatus, n };
+}
+
+// â”€â”€ Calculator per auto (dossier beheer) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function CalculatorContent() {
+  const [dossiers, setDossiers] = useState<Dossier[]>([]);
+  const [actief, setActief] = useState<Dossier | null>(null);
+  const [laden, setLaden] = useState(true);
+  const [toonNieuw, setToonNieuw] = useState(false);
+  const [nieuwNaam, setNieuwNaam] = useState("");
+  const [mobileView, setMobileView] = useState<"lijst" | "detail">("lijst");
+  const [opgeslagen, setOpgeslagen] = useState(false);
+
+  // Local edit state for the active dossier
+  const [autoNaam, setAutoNaam] = useState("");
+  const [inkoopprijs, setInkoopprijs] = useState("");
+  const [btwType, setBtwType] = useState<"marge" | "21">("marge");
+  const [verkoopprijs, setVerkoopprijs] = useState("");
+  const [kosten, setKosten] = useState<KostenRegel[]>(STANDAARD_KOSTEN);
+
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipSave = useRef(false);
+
+  const openDossier = useCallback((d: Dossier) => {
+    setActief(d);
+    skipSave.current = true;
+    setAutoNaam(d.auto_naam);
+    setInkoopprijs(d.inkoop > 0 ? String(d.inkoop) : "");
+    setBtwType(d.btw_type);
+    setVerkoopprijs(d.verkoopprijs > 0 ? String(d.verkoopprijs) : "");
+    setKosten(d.kosten.length > 0 ? [...d.kosten] : [...STANDAARD_KOSTEN]);
+    setMobileView("detail");
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/admin/dossiers")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: Dossier[]) => {
+        setDossiers(data);
+        setLaden(false);
+        if (data.length > 0) openDossier(data[0]);
+      });
+  }, [openDossier]);
+
+  // Auto-save with 700ms debounce
+  useEffect(() => {
+    if (!actief) return;
+    if (skipSave.current) { skipSave.current = false; return; }
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    const data = {
+      auto_naam: autoNaam,
+      inkoop: parseFloat(inkoopprijs.replace(",", ".")) || 0,
+      btw_type: btwType,
+      verkoopprijs: parseFloat(verkoopprijs.replace(",", ".")) || 0,
+      kosten,
+    };
+    const id = actief.id;
+    saveTimer.current = setTimeout(async () => {
+      await fetch(`/api/admin/dossiers/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      setDossiers((prev) => prev.map((d) => (d.id === id ? { ...d, ...data } : d)));
+      setOpgeslagen(true);
+      setTimeout(() => setOpgeslagen(false), 2000);
+    }, 700);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoNaam, inkoopprijs, btwType, verkoopprijs, kosten]);
+
+  const maakNieuwDossier = async () => {
+    if (!nieuwNaam.trim()) return;
+    const res = await fetch("/api/admin/dossiers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ auto_naam: nieuwNaam.trim() }),
+    });
+    if (res.ok) {
+      const d: Dossier = await res.json();
+      setDossiers((prev) => [d, ...prev]);
+      openDossier(d);
+      setNieuwNaam("");
+      setToonNieuw(false);
+    }
+  };
+
+  const verwijderDossier = async (id: number) => {
+    await fetch(`/api/admin/dossiers/${id}`, { method: "DELETE" });
+    const rest = dossiers.filter((d) => d.id !== id);
+    setDossiers(rest);
+    if (actief?.id === id) {
+      if (rest.length > 0) openDossier(rest[0]);
+      else { setActief(null); setMobileView("lijst"); }
+    }
+  };
 
   const addRegel = () => setKosten((p) => [...p, { label: "", bedrag: "" }]);
   const removeRegel = (i: number) => setKosten((p) => p.filter((_, j) => j !== i));
   const updateRegel = (i: number, f: "label" | "bedrag", v: string) =>
-    setKosten((p) => p.map((k, j) => j === i ? { ...k, [f]: v } : k));
+    setKosten((p) => p.map((k, j) => (j === i ? { ...k, [f]: v } : k)));
+
+  const calc = useCalculatorLogic(inkoopprijs, btwType, verkoopprijs, kosten);
 
   const veld: React.CSSProperties = {
     border: "1px solid rgba(0,19,55,0.15)", color: "#001337",
     fontFamily: "var(--font-inter)", backgroundColor: "#fafafa", outline: "none",
   };
 
-  const reset = () => { setInkoopprijs(""); setVerkoopprijs(""); setKosten(STANDAARD_KOSTEN); setBtwType("marge"); };
+  // Quick winst for sidebar display
+  const calcWinstSnel = (d: Dossier): number | null => {
+    const k = d.inkoop + d.kosten.reduce((s, kk) => s + (parseFloat(kk.bedrag) || 0), 0);
+    if (d.verkoopprijs <= 0) return null;
+    if (d.btw_type === "marge") {
+      const m = d.verkoopprijs - k;
+      return m > 0 ? Math.round((m - (m * 21) / 121) * 100) / 100 : m;
+    }
+    const ex = Math.round((d.verkoopprijs / 1.21) * 100) / 100;
+    return Math.round((ex - k) * 100) / 100;
+  };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
-
-      {/* Invoer */}
-      <div className="flex-1 flex flex-col gap-4 lg:max-w-[480px]">
-          {/* Inkoop */}
-          <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
-            <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Inkoop</p>
-            </div>
-            <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Inkoopprijs (€)</label>
-                <input type="number" value={inkoopprijs} onChange={(e) => setInkoopprijs(e.target.value)}
-                  placeholder="bijv. 8500" className="w-full px-3 py-2.5 text-sm" style={veld} />
-              </div>
-              <div>
-                <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>BTW type</label>
-                <select value={btwType} onChange={(e) => setBtwType(e.target.value as "marge" | "21")}
-                  className="w-full px-3 py-2.5 text-sm" style={veld}>
-                  <option value="marge">Margeregeling (particulier)</option>
-                  <option value="21">21% BTW (bedrijf)</option>
-                </select>
-              </div>
-              {btwType === "21" && (
-                <p className="col-span-full text-[10px] leading-relaxed" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
-                  Inkoopprijs excl. BTW invullen, verkoopprijs incl. BTW.
-                </p>
-              )}
-            </div>
+    <div className="flex flex-col h-full">
+      <PageHeader
+        title="Marge Calculator"
+        subtitle={actief ? (autoNaam || actief.auto_naam || "Dossier") : "Per auto bijhouden"}
+        action={
+          <div className="flex items-center gap-3">
+            {opgeslagen && (
+              <span className="text-[11px] hidden md:inline" style={{ color: "#15803d", fontFamily: "var(--font-inter)" }}>
+                Opgeslagen âœ“
+              </span>
+            )}
+            <button
+              onClick={() => { setToonNieuw((v) => !v); setNieuwNaam(""); }}
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold transition-all hover:opacity-90"
+              style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}
+            >
+              <Plus size={12} /> Nieuw dossier
+            </button>
           </div>
+        }
+      />
 
-          {/* Kosten */}
-          <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
-            <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Extra kosten</p>
-            </div>
-            <div className="p-5 flex flex-col gap-3">
-              {kosten.map((k, i) => (
-                <div key={i} className="flex gap-2 items-center">
-                  <input type="text" value={k.label} onChange={(e) => updateRegel(i, "label", e.target.value)}
-                    placeholder="Omschrijving" className="flex-1 px-3 py-2 text-sm" style={veld} />
-                  <div className="relative" style={{ width: "110px" }}>
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>€</span>
-                    <input type="number" value={k.bedrag} onChange={(e) => updateRegel(i, "bedrag", e.target.value)}
-                      placeholder="0" className="w-full pl-8 pr-3 py-2 text-sm" style={veld} />
-                  </div>
-                  <button onClick={() => removeRegel(i)} className="flex-shrink-0 p-2 transition-all hover:opacity-60" style={{ color: "rgba(0,19,55,0.3)" }}>
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              ))}
-              <button onClick={addRegel} className="mt-1 flex items-center gap-1.5 text-xs transition-all hover:opacity-70"
-                style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
-                <Plus size={12} /> Regel toevoegen
+      <div className="flex flex-1 overflow-hidden">
+        {/* â”€â”€ Zijbalk: dossier lijst â”€â”€ */}
+        <aside
+          className={`${mobileView === "detail" ? "hidden md:flex" : "flex"} flex-col flex-shrink-0`}
+          style={{ width: "210px", borderRight: "1px solid rgba(0,19,55,0.08)", backgroundColor: "#f8f9fb" }}
+        >
+          {/* Nieuw dossier formulier */}
+          {toonNieuw && (
+            <div className="px-3 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.07)", backgroundColor: "#fff" }}>
+              <input
+                autoFocus
+                type="text"
+                value={nieuwNaam}
+                onChange={(e) => setNieuwNaam(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") maakNieuwDossier();
+                  if (e.key === "Escape") setToonNieuw(false);
+                }}
+                placeholder="bijv. Fiat 500 1.2"
+                className="w-full px-3 py-2 text-sm mb-2"
+                style={veld}
+              />
+              <button
+                onClick={maakNieuwDossier}
+                className="w-full py-1.5 text-xs font-semibold transition-all hover:opacity-90"
+                style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}
+              >
+                Aanmaken
               </button>
             </div>
-          </div>
+          )}
 
-          {/* Verkoopprijs */}
-          <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
-            <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Gewenste verkoopprijs</p>
-            </div>
-            <div className="p-5">
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>€</span>
-                <input type="number" value={verkoopprijs} onChange={(e) => setVerkoopprijs(e.target.value)}
-                  placeholder={breakEven > 0 ? ("Min. " + Math.ceil(breakEven).toLocaleString("nl-NL") + " voor break-even") : "bijv. 11500"}
-                  className="w-full pl-12 pr-3 py-2.5 text-sm" style={veld} />
+          {/* Dossier lijst */}
+          <div className="flex-1 overflow-y-auto">
+            {laden ? (
+              <p className="p-4 text-xs" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Laden...</p>
+            ) : dossiers.length === 0 ? (
+              <div className="p-4 text-center">
+                <p className="text-xs mb-3" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>Nog geen dossiers</p>
+                <button
+                  onClick={() => setToonNieuw(true)}
+                  className="text-xs underline transition-all hover:opacity-70"
+                  style={{ color: "#001337", fontFamily: "var(--font-inter)" }}
+                >
+                  Eerste dossier maken
+                </button>
               </div>
-            </div>
+            ) : (
+              dossiers.map((d) => {
+                const w = calcWinstSnel(d);
+                const isActief = actief?.id === d.id;
+                return (
+                  <div
+                    key={d.id}
+                    className="group relative cursor-pointer"
+                    style={{
+                      borderLeft: `2px solid ${isActief ? "#001337" : "transparent"}`,
+                      borderBottom: "1px solid rgba(0,19,55,0.05)",
+                      backgroundColor: isActief ? "#ffffff" : "transparent",
+                    }}
+                    onClick={() => openDossier(d)}
+                  >
+                    <div className="px-4 py-3 pr-8">
+                      <p className="text-sm font-semibold truncate" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
+                        {d.auto_naam || "Naamloos"}
+                      </p>
+                      <p className="text-[10px] mt-0.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
+                        {d.inkoop > 0 ? ("â‚¬" + d.inkoop.toLocaleString("nl-NL")) : "Inkoop: â€”"}
+                      </p>
+                      {w !== null ? (
+                        <p className="text-[11px] font-semibold mt-1" style={{ color: w > 0 ? "#15803d" : w < 0 ? "#b91c1c" : "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
+                          {w > 0 ? "+" : ""}{"â‚¬" + Math.abs(w).toLocaleString("nl-NL", { maximumFractionDigits: 0 })}
+                        </p>
+                      ) : (
+                        <p className="text-[10px] mt-0.5" style={{ color: "rgba(0,19,55,0.3)", fontFamily: "var(--font-inter)" }}>Geen verkoop</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); verwijderDossier(d.id); }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5"
+                      style={{ color: "rgba(0,19,55,0.3)" }}
+                    >
+                      <Trash2 size={11} />
+                    </button>
+                  </div>
+                );
+              })
+            )}
           </div>
-        </div>
+        </aside>
 
-        {/* Resultaten */}
-        <div className="lg:w-[320px] flex flex-col gap-3">
-          {/* Kostprijsoverzicht */}
-          <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
-            <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Kostprijsoverzicht</p>
+        {/* â”€â”€ Calculator paneel â”€â”€ */}
+        <div
+          className={`${mobileView === "lijst" ? "hidden md:flex" : "flex"} flex-col flex-1 overflow-y-auto`}
+        >
+          {!actief ? (
+            <div className="flex flex-col items-center justify-center flex-1 py-20 px-8">
+              <Calculator size={36} style={{ color: "rgba(0,19,55,0.1)" }} />
+              <p className="text-base font-bold mt-4 mb-2" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
+                Geen dossier geselecteerd
+              </p>
+              <p className="text-sm text-center mb-5" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
+                Maak een nieuw dossier aan via de knop rechtsboven
+              </p>
             </div>
-            <div className="p-5">
-              <table className="w-full text-sm" style={{ fontFamily: "var(--font-inter)" }}>
-                <tbody>
-                  <tr>
-                    <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Inkoopprijs</td>
-                    <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{inkoop > 0 ? ("€ " + fmt(inkoop)) : "---"}</td>
-                  </tr>
-                  {kosten.filter(k => n(k.bedrag) > 0).map((k, i) => (
-                    <tr key={i}>
-                      <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>{k.label || "Kosten"}</td>
-                      <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + fmt(n(k.bedrag))}</td>
-                    </tr>
-                  ))}
-                  <tr style={{ borderTop: "1px solid rgba(0,19,55,0.08)" }}>
-                    <td className="pt-3 pb-1 font-bold" style={{ color: "#001337" }}>Totale kostprijs</td>
-                    <td className="pt-3 pb-1 text-right font-bold" style={{ color: "#001337" }}>{totaalKostprijs > 0 ? ("€ " + fmt(totaalKostprijs)) : "---"}</td>
-                  </tr>
-                  {breakEven > 0 && (
-                    <tr>
-                      <td className="py-1" style={{ color: "rgba(0,19,55,0.45)", fontSize: "11px" }}>Break-even verkoopprijs</td>
-                      <td className="py-1 text-right" style={{ color: "rgba(0,19,55,0.45)", fontSize: "11px" }}>{"€ " + fmt(breakEven)}</td>
-                    </tr>
+          ) : (
+            <div className="p-4 md:p-6">
+              {/* Mobiel: terug knop */}
+              <button
+                className="flex items-center gap-1.5 text-xs mb-4 md:hidden transition-all hover:opacity-70"
+                style={{ color: "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)" }}
+                onClick={() => setMobileView("lijst")}
+              >
+                â† Terug naar overzicht
+              </button>
+
+              <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
+                {/* Invoer */}
+                <div className="flex-1 flex flex-col gap-4 lg:max-w-[480px]">
+                  {/* Auto naam */}
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+                    <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Auto</p>
+                    </div>
+                    <div className="p-5">
+                      <input
+                        type="text"
+                        value={autoNaam}
+                        onChange={(e) => setAutoNaam(e.target.value)}
+                        placeholder="bijv. Fiat 500 1.2 Lounge"
+                        className="w-full px-3 py-2.5 text-sm"
+                        style={veld}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Inkoop */}
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+                    <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Inkoop</p>
+                    </div>
+                    <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Inkoopprijs (â‚¬)</label>
+                        <input type="number" value={inkoopprijs} onChange={(e) => setInkoopprijs(e.target.value)}
+                          placeholder="bijv. 8500" className="w-full px-3 py-2.5 text-sm" style={veld} />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>BTW type</label>
+                        <select value={btwType} onChange={(e) => setBtwType(e.target.value as "marge" | "21")}
+                          className="w-full px-3 py-2.5 text-sm" style={veld}>
+                          <option value="marge">Margeregeling (particulier)</option>
+                          <option value="21">21% BTW (bedrijf)</option>
+                        </select>
+                      </div>
+                      {btwType === "21" && (
+                        <p className="col-span-full text-[10px] leading-relaxed" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
+                          Inkoopprijs excl. BTW invullen, verkoopprijs incl. BTW.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Kosten */}
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+                    <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Extra kosten</p>
+                    </div>
+                    <div className="p-5 flex flex-col gap-3">
+                      {kosten.map((k, i) => (
+                        <div key={i} className="flex gap-2 items-center">
+                          <input type="text" value={k.label} onChange={(e) => updateRegel(i, "label", e.target.value)}
+                            placeholder="Omschrijving" className="flex-1 px-3 py-2 text-sm" style={veld} />
+                          <div className="relative" style={{ width: "110px" }}>
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>â‚¬</span>
+                            <input type="number" value={k.bedrag} onChange={(e) => updateRegel(i, "bedrag", e.target.value)}
+                              placeholder="0" className="w-full pl-8 pr-3 py-2 text-sm" style={veld} />
+                          </div>
+                          <button onClick={() => removeRegel(i)} className="flex-shrink-0 p-2 transition-all hover:opacity-60" style={{ color: "rgba(0,19,55,0.3)" }}>
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))}
+                      <button onClick={addRegel} className="mt-1 flex items-center gap-1.5 text-xs transition-all hover:opacity-70"
+                        style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
+                        <Plus size={12} /> Regel toevoegen
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Verkoopprijs */}
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+                    <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Gewenste verkoopprijs</p>
+                    </div>
+                    <div className="p-5">
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>â‚¬</span>
+                        <input type="number" value={verkoopprijs} onChange={(e) => setVerkoopprijs(e.target.value)}
+                          placeholder={calc.breakEven > 0 ? ("Min. " + Math.ceil(calc.breakEven).toLocaleString("nl-NL") + " voor break-even") : "bijv. 11500"}
+                          className="w-full pl-12 pr-3 py-2.5 text-sm" style={veld} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Resultaten */}
+                <div className="lg:w-[320px] flex flex-col gap-3">
+                  {/* Kostprijsoverzicht */}
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+                    <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Kostprijsoverzicht</p>
+                    </div>
+                    <div className="p-5">
+                      <table className="w-full text-sm" style={{ fontFamily: "var(--font-inter)" }}>
+                        <tbody>
+                          <tr>
+                            <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Inkoopprijs</td>
+                            <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{calc.inkoop > 0 ? ("â‚¬ " + calc.fmt(calc.inkoop)) : "---"}</td>
+                          </tr>
+                          {kosten.filter((k) => calc.n(k.bedrag) > 0).map((k, i) => (
+                            <tr key={i}>
+                              <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>{k.label || "Kosten"}</td>
+                              <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"â‚¬ " + calc.fmt(calc.n(k.bedrag))}</td>
+                            </tr>
+                          ))}
+                          <tr style={{ borderTop: "1px solid rgba(0,19,55,0.08)" }}>
+                            <td className="pt-3 pb-1 font-bold" style={{ color: "#001337" }}>Totale kostprijs</td>
+                            <td className="pt-3 pb-1 text-right font-bold" style={{ color: "#001337" }}>{calc.totaalKostprijs > 0 ? ("â‚¬ " + calc.fmt(calc.totaalKostprijs)) : "---"}</td>
+                          </tr>
+                          {calc.breakEven > 0 && (
+                            <tr>
+                              <td className="py-1" style={{ color: "rgba(0,19,55,0.45)", fontSize: "11px" }}>Break-even verkoopprijs</td>
+                              <td className="py-1 text-right" style={{ color: "rgba(0,19,55,0.45)", fontSize: "11px" }}>{"â‚¬ " + calc.fmt(calc.breakEven)}</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Resultaat */}
+                  {calc.verkoop > 0 && (
+                    <div style={{
+                      backgroundColor: calc.winststatus === "winst" ? "#f0fdf4" : calc.winststatus === "verlies" ? "#fef2f2" : "#f8fafc",
+                      border: ("1px solid " + (calc.winststatus === "winst" ? "#86efac" : calc.winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.07)")),
+                    }}>
+                      <div className="px-5 py-3" style={{
+                        borderBottom: ("1px solid " + (calc.winststatus === "winst" ? "#bbf7d0" : calc.winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.06)")),
+                        backgroundColor: calc.winststatus === "winst" ? "rgba(21,128,61,0.05)" : calc.winststatus === "verlies" ? "rgba(185,28,28,0.04)" : "rgba(0,19,55,0.02)",
+                      }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Resultaat</p>
+                      </div>
+                      <div className="p-5">
+                        <table className="w-full text-sm" style={{ fontFamily: "var(--font-inter)" }}>
+                          <tbody>
+                            <tr>
+                              <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Verkoopprijs</td>
+                              <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"â‚¬ " + calc.fmt(calc.verkoop)}</td>
+                            </tr>
+                            {btwType === "marge" && calc.verkoop > 0 && (
+                              <tr>
+                                <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Bruto marge</td>
+                                <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"â‚¬ " + calc.fmt(calc.verkoop - calc.totaalKostprijs)}</td>
+                              </tr>
+                            )}
+                            {btwType === "21" && (
+                              <tr>
+                                <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Excl. BTW</td>
+                                <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"â‚¬ " + calc.fmt(calc.verkoopExBtw)}</td>
+                              </tr>
+                            )}
+                            <tr>
+                              <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>{btwType === "marge" ? "BTW afdragen (op marge)" : "BTW afdragen (21%)"}</td>
+                              <td className="py-1.5 text-right font-semibold" style={{ color: calc.btwAfdracht > 0 ? "#b45309" : "rgba(0,19,55,0.55)" }}>
+                                {calc.btwAfdracht > 0 ? ("âˆ’ â‚¬ " + calc.fmt(calc.btwAfdracht)) : "â‚¬ 0,00"}
+                              </td>
+                            </tr>
+                            <tr style={{ borderTop: ("2px solid " + (calc.winststatus === "winst" ? "#86efac" : calc.winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.12)")) }}>
+                              <td className="pt-3 font-bold text-base" style={{ color: "#001337" }}>Netto winst</td>
+                              <td className="pt-3 text-right font-bold text-base" style={{ color: calc.winststatus === "winst" ? "#15803d" : calc.winststatus === "verlies" ? "#b91c1c" : "#001337" }}>
+                                {(calc.nettoWinst >= 0 ? "" : "- ") + "â‚¬ " + calc.fmt(Math.abs(calc.nettoWinst))}
+                              </td>
+                            </tr>
+                            {calc.winstPct !== 0 && (
+                              <tr>
+                                <td style={{ color: "rgba(0,19,55,0.4)", fontSize: "11px" }}>Winstmarge</td>
+                                <td className="text-right" style={{ color: calc.winstPct > 0 ? "#15803d" : "#b91c1c", fontSize: "11px", fontWeight: 600 }}>
+                                  {(calc.winstPct > 0 ? "+" : "") + calc.winstPct + "%"}
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   )}
-                </tbody>
-              </table>
-            </div>
-          </div>
 
-          {/* Resultaat */}
-          {verkoop > 0 && (
-            <div style={{
-              backgroundColor: winststatus === "winst" ? "#f0fdf4" : winststatus === "verlies" ? "#fef2f2" : "#f8fafc",
-              border: ("1px solid " + (winststatus === "winst" ? "#86efac" : winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.07)")),
-            }}>
-              <div className="px-5 py-3" style={{
-                borderBottom: ("1px solid " + (winststatus === "winst" ? "#bbf7d0" : winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.06)")),
-                backgroundColor: winststatus === "winst" ? "rgba(21,128,61,0.05)" : winststatus === "verlies" ? "rgba(185,28,28,0.04)" : "rgba(0,19,55,0.02)",
-              }}>
-                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Resultaat</p>
+                  {calc.totaalKostprijs > 0 && calc.verkoop === 0 && (
+                    <div className="px-4 py-3 text-xs" style={{ backgroundColor: "rgba(0,19,55,0.03)", border: "1px solid rgba(0,19,55,0.07)", color: "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)", lineHeight: 1.7 }}>
+                      Vul een verkoopprijs in om je winst te berekenen.<br />
+                      <strong style={{ color: "#001337" }}>{"Break-even: â‚¬ " + calc.fmt(calc.breakEven)}</strong>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="p-5">
-                <table className="w-full text-sm" style={{ fontFamily: "var(--font-inter)" }}>
-                  <tbody>
-                    <tr>
-                      <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Verkoopprijs</td>
-                      <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + fmt(verkoop)}</td>
-                    </tr>
-                    {btwType === "marge" && verkoop > 0 && (
-                      <tr>
-                        <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Bruto marge</td>
-                        <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + fmt(verkoop - totaalKostprijs)}</td>
-                      </tr>
-                    )}
-                    {btwType === "21" && (
-                      <tr>
-                        <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Excl. BTW</td>
-                        <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + fmt(verkoopExBtw)}</td>
-                      </tr>
-                    )}
-                    <tr>
-                      <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>{btwType === "marge" ? "BTW afdragen (op marge)" : "BTW afdragen (21%)"}</td>
-                      <td className="py-1.5 text-right font-semibold" style={{ color: btwAfdracht > 0 ? "#b45309" : "rgba(0,19,55,0.55)" }}>
-                        {btwAfdracht > 0 ? ("− € " + fmt(btwAfdracht)) : "€ 0,00"}
-                      </td>
-                    </tr>
-                    <tr style={{ borderTop: ("2px solid " + (winststatus === "winst" ? "#86efac" : winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.12)")) }}>
-                      <td className="pt-3 font-bold text-base" style={{ color: "#001337" }}>Netto winst</td>
-                      <td className="pt-3 text-right font-bold text-base" style={{ color: winststatus === "winst" ? "#15803d" : winststatus === "verlies" ? "#b91c1c" : "#001337" }}>
-                        {(nettoWinst >= 0 ? "" : "- ") + "€ " + fmt(Math.abs(nettoWinst))}
-                      </td>
-                    </tr>
-                    {winstPct !== 0 && (
-                      <tr>
-                        <td style={{ color: "rgba(0,19,55,0.4)", fontSize: "11px" }}>Winstmarge</td>
-                        <td className="text-right" style={{ color: winstPct > 0 ? "#15803d" : "#b91c1c", fontSize: "11px", fontWeight: 600 }}>
-                          {(winstPct > 0 ? "+" : "") + winstPct + "%"}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {totaalKostprijs > 0 && verkoop === 0 && (
-            <div className="px-4 py-3 text-xs" style={{ backgroundColor: "rgba(0,19,55,0.03)", border: "1px solid rgba(0,19,55,0.07)", color: "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)", lineHeight: 1.7 }}>
-              Vul een verkoopprijs in om je winst te berekenen.<br />
-              <strong style={{ color: "#001337" }}>{"Break-even: € " + fmt(breakEven)}</strong>
             </div>
           )}
         </div>
-      </div>
-  );
-}
-
-function CalculatorContent() {
-  return (
-    <div>
-      <PageHeader title="Marge Calculator" subtitle="Bereken je winst na BTW en kosten" />
-      <div className="p-4 md:p-8">
-        <CalculatorPanel />
       </div>
     </div>
   );
