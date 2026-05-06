@@ -1890,7 +1890,7 @@ function CalculatorContent() {
                     <tr>
                       <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>{btwType === "marge" ? "BTW afdragen (op marge)" : "BTW afdragen (21%)"}</td>
                       <td className="py-1.5 text-right font-semibold" style={{ color: btwAfdracht > 0 ? "#b45309" : "rgba(0,19,55,0.55)" }}>
-                        {btwAfdracht > 0 ? ("- "€ " + fmt(btwAfdracht)) : "€ 0,00"}
+                        {btwAfdracht > 0 ? ("− € " + fmt(btwAfdracht)) : "€ 0,00"}
                       </td>
                     </tr>
                     <tr style={{ borderTop: ("2px solid " + (winststatus === "winst" ? "#86efac" : winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.12)")) }}>
@@ -1916,7 +1916,7 @@ function CalculatorContent() {
           {totaalKostprijs > 0 && verkoop === 0 && (
             <div className="px-4 py-3 text-xs" style={{ backgroundColor: "rgba(0,19,55,0.03)", border: "1px solid rgba(0,19,55,0.07)", color: "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)", lineHeight: 1.7 }}>
               Vul een verkoopprijs in om je winst te berekenen.<br />
-              <strong style={{ color: "#001337" }}>{"Break-even: "€ " + fmt(breakEven)}</strong>
+              <strong style={{ color: "#001337" }}>{"Break-even: € " + fmt(breakEven)}</strong>
             </div>
           )}
         </div>
