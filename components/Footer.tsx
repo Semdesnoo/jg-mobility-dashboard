@@ -69,6 +69,8 @@ export default function Footer() {
                 { label: "Aanbod", href: "/aanbod" },
                 { label: "Ons Verhaal", href: "/over-ons" },
                 { label: "Contact", href: "/contact" },
+                { label: "Blog", href: "/blog" },
+                { label: "Veelgestelde vragen", href: "/faq" },
               ].map((item) => (
                 <li key={item.href}>
                   <Link

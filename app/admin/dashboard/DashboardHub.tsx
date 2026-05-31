@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
@@ -156,8 +156,19 @@ function PlaceholderTab({
   );
 }
 
+const NAV_META: Record<Tab, string> = {
+  dashboard:   "Overzicht & voorraadstatus",
+  email:       "Berichten & klantcontact",
+  voorraad:    "Beheer je auto's",
+  cosignatie:  "Aanvragen & deals",
+  social:      "Posts & marketing",
+  facturen:    "Maak en beheer facturen",
+  calculator:  "Bereken marge per auto",
+};
+
 export default function DashboardHub() {
   const [tab, setTab] = useState<Tab>("dashboard");
+  const [mobileHub, setMobileHub] = useState(true);
   const [autos, setAutos] = useState<Auto[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [countdown, setCountdown] = useState(60);
@@ -201,7 +212,7 @@ export default function DashboardHub() {
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "#f0f2f5" }}>
-      {/* â”€â”€ Zijbalk (alleen desktop) â”€â”€ */}
+      {/* ── Zijbalk (alleen desktop) ── */}
       <aside
         className="hidden md:flex flex-col flex-shrink-0"
         style={{ width: "220px", backgroundColor: "#001337", height: "100vh" }}
@@ -253,7 +264,7 @@ export default function DashboardHub() {
             <RefreshCw size={10} className={refreshing ? "animate-spin" : ""} />
             {refreshing
               ? "Verversen..."
-              : `${countdown}s Â· ${lastRefresh.toLocaleTimeString("nl-NL", {
+              : `${countdown}s · ${lastRefresh.toLocaleTimeString("nl-NL", {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}`}
@@ -275,8 +286,24 @@ export default function DashboardHub() {
         </div>
       </aside>
 
-      {/* â”€â”€ Hoofdinhoud â”€â”€ */}
-      <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
+      {/* ── Hoofdinhoud ── */}
+      <main className="flex-1 overflow-y-auto">
+        {/* Mobiel: terug-balk */}
+        <div
+          className={`md:hidden sticky top-0 z-20 flex items-center gap-3 px-4 h-13 ${mobileHub ? "hidden" : "flex"}`}
+          style={{ backgroundColor: "#001337", height: "52px" }}
+        >
+          <button
+            onClick={() => setMobileHub(true)}
+            className="flex items-center gap-1.5 text-sm transition-all hover:opacity-70"
+            style={{ color: "rgba(255,255,255,0.7)", fontFamily: "var(--font-inter)" }}
+          >
+            ← Menu
+          </button>
+          <span className="text-sm font-semibold text-white" style={{ fontFamily: "var(--font-inter)" }}>
+            {NAV.find((n) => n.id === tab)?.label}
+          </span>
+        </div>
         {tab === "dashboard" && (
           <DashboardContent
             autos={autos}
@@ -300,47 +327,89 @@ export default function DashboardHub() {
         {tab === "calculator" && <CalculatorContent />}
       </main>
 
-      {/* â”€â”€ Bottom nav (alleen mobiel) â”€â”€ */}
-      <nav
-        className="fixed bottom-0 left-0 right-0 md:hidden flex z-50"
-        style={{ backgroundColor: "#001337", borderTop: "1px solid rgba(255,255,255,0.08)", height: "60px" }}
-      >
-        {NAV.map(({ id, icon: Icon }) => {
-          const mobileLabels: Record<Tab, string> = {
-            dashboard: "Home",
-            email: "Email",
-            voorraad: "Voorraad",
-            cosignatie: "Consignatie",
-            social: "Social",
-            facturen: "Facturen",
-            calculator: "Calc.",
-          };
-          return (
-            <button
-              key={id}
-              onClick={() => setTab(id)}
-              className="flex-1 flex flex-col items-center justify-center gap-0.5 transition-all"
-            >
-              <Icon size={18} style={{ color: tab === id ? "#ffffff" : "rgba(255,255,255,0.38)" }} />
-              <span
-                style={{
-                  fontSize: "9px",
-                  fontFamily: "var(--font-inter)",
-                  color: tab === id ? "#ffffff" : "rgba(255,255,255,0.38)",
-                  letterSpacing: "0.03em",
-                }}
+      {/* ── Mobiele hub (full-screen overlay) ── */}
+      {mobileHub && (
+        <div
+          className="md:hidden fixed inset-0 z-50 overflow-y-auto flex flex-col"
+          style={{ backgroundColor: "#f0f2f5" }}
+        >
+          {/* Header */}
+          <div style={{ backgroundColor: "#001337" }} className="px-6 pt-10 pb-8">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <p className="text-[10px] tracking-widest uppercase mb-1" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-inter)" }}>
+                  Beheer
+                </p>
+                <h1 className="text-2xl font-bold text-white" style={{ fontFamily: "var(--font-playfair)" }}>
+                  JG Mobility
+                </h1>
+              </div>
+              <form action="/api/admin/logout" method="POST">
+                <button
+                  type="submit"
+                  className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium"
+                  style={{ backgroundColor: "rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.55)", fontFamily: "var(--font-inter)", border: "1px solid rgba(255,255,255,0.1)" }}
+                >
+                  <LogOut size={11} />
+                  Uitloggen
+                </button>
+              </form>
+            </div>
+            <div>
+              <p className="text-base font-semibold text-white mb-0.5" style={{ fontFamily: "var(--font-inter)" }}>
+                Welkom terug
+              </p>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-inter)" }}>
+                {new Date().toLocaleDateString("nl-NL", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+              </p>
+            </div>
+          </div>
+
+          {/* Snelle stats */}
+          <div className="px-4 pt-5 pb-2 grid grid-cols-3 gap-2">
+            {[
+              { label: "Beschikbaar", value: beschikbaar.length },
+              { label: "Verkocht", value: verkocht.length },
+              { label: "Totaal", value: autos.length },
+            ].map((s) => (
+              <div key={s.label} className="flex flex-col items-center justify-center py-3" style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+                <p className="text-xl font-bold" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>{s.value}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Nav kaarten */}
+          <div className="px-4 pt-3 pb-8 grid grid-cols-2 gap-3">
+            {NAV.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => { setTab(id); setMobileHub(false); }}
+                className="flex flex-col items-start p-4 text-left transition-all active:scale-95"
+                style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}
               >
-                {mobileLabels[id]}
-              </span>
-            </button>
-          );
-        })}
-      </nav>
+                <div
+                  className="flex items-center justify-center mb-3"
+                  style={{ width: "40px", height: "40px", backgroundColor: "rgba(0,19,55,0.05)" }}
+                >
+                  <Icon size={18} style={{ color: "#001337" }} />
+                </div>
+                <p className="text-sm font-bold mb-1" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
+                  {label}
+                </p>
+                <p className="text-[11px] leading-snug" style={{ color: "rgba(0,19,55,0.42)", fontFamily: "var(--font-inter)" }}>
+                  {NAV_META[id]}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-// â”€â”€ Dashboard overzicht â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Dashboard overzicht ─────────────────────────────────────────
 function DashboardContent({
   autos,
   beschikbaar,
@@ -357,6 +426,8 @@ function DashboardContent({
   const totaalWaarde = beschikbaar.reduce((s, a) => s + a.prijs, 0);
 
   const updateStatus = async (id: number, status: "beschikbaar" | "gereserveerd" | "verkocht") => {
+    if (status === "gereserveerd" && !confirm("Wil je deze auto als Gereserveerd markeren?")) return;
+    if (status === "verkocht" && !confirm("Wil je deze auto als Verkocht markeren?")) return;
     await fetch(`/api/admin/autos/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -374,14 +445,15 @@ function DashboardContent({
           minute: "2-digit",
         })}`}
         action={
-          <Link
-            href="/aanbod"
+          <a
+            href="https://www.jgmobility.nl/aanbod"
             target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold transition-all hover:opacity-70"
             style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
           >
             <ExternalLink size={12} /> Website
-          </Link>
+          </a>
         }
       />
 
@@ -393,7 +465,7 @@ function DashboardContent({
           <StatCard label="Totaal voertuigen" value={autos.length} />
           <StatCard
             label="Totale voorraadwaarde"
-            value={totaalWaarde ? `â‚¬${totaalWaarde.toLocaleString("nl-NL")}` : "â€”"}
+            value={totaalWaarde ? `€${totaalWaarde.toLocaleString("nl-NL")}` : "—"}
           />
         </div>
 
@@ -416,7 +488,7 @@ function DashboardContent({
           </div>
         </div>
 
-        {/* Voorraad â€” volle breedte */}
+        {/* Voorraad — volle breedte */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-bold" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
@@ -484,12 +556,12 @@ function DashboardContent({
                           )}
                         </div>
                         <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
-                          {auto.bouwjaar} Â· {auto.km.toLocaleString("nl-NL")} km Â· {auto.brandstof}
+                          {auto.bouwjaar} · {auto.km.toLocaleString("nl-NL")} km · {auto.brandstof}
                         </p>
                       </div>
                       <div className="text-right flex-shrink-0 md:mr-2">
                         <p className="text-sm md:text-base font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
-                          â‚¬{auto.prijs.toLocaleString("nl-NL")}
+                          €{auto.prijs.toLocaleString("nl-NL")}
                         </p>
                         <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
                           {auto.fotos?.length ?? 0} foto&apos;s
@@ -515,14 +587,15 @@ function DashboardContent({
                           </button>
                         );
                       })}
-                      <Link
-                        href={`/aanbod/${auto.slug}`}
+                      <a
+                        href={`https://www.jgmobility.nl/aanbod/${auto.slug}`}
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="px-3 py-1.5 text-xs font-semibold transition-all hover:opacity-70"
                         style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
                       >
                         Bekijk
-                      </Link>
+                      </a>
                       <DeleteButton id={auto.id} naam={`${auto.merk} ${auto.model}`} />
                     </div>
                   </div>
@@ -536,7 +609,7 @@ function DashboardContent({
   );
 }
 
-// â”€â”€ Email â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Email ───────────────────────────────────────────────────────
 function EmailContent() {
   return (
     <div>
@@ -562,12 +635,14 @@ function EmailContent() {
   );
 }
 
-// â”€â”€ Auto Voorraad â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Auto Voorraad ───────────────────────────────────────────────
 function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => void }) {
   const beschikbaar = autos.filter((a) => !a.verkocht);
   const verkocht = autos.filter((a) => a.verkocht);
 
   const updateStatus = async (id: number, status: "beschikbaar" | "gereserveerd" | "verkocht") => {
+    if (status === "gereserveerd" && !confirm("Wil je deze auto als Gereserveerd markeren?")) return;
+    if (status === "verkocht" && !confirm("Wil je deze auto als Verkocht markeren?")) return;
     await fetch(`/api/admin/autos/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -580,7 +655,7 @@ function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => voi
     <div>
       <PageHeader
         title="Auto Voorraad"
-        subtitle={`${beschikbaar.length} beschikbaar Â· ${verkocht.length} verkocht`}
+        subtitle={`${beschikbaar.length} beschikbaar · ${verkocht.length} verkocht`}
         action={
           <Link
             href="/admin/auto-toevoegen"
@@ -660,13 +735,13 @@ function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => voi
                         )}
                       </div>
                       <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
-                        {auto.bouwjaar} Â· {auto.km.toLocaleString("nl-NL")} km Â· {auto.brandstof}
+                        {auto.bouwjaar} · {auto.km.toLocaleString("nl-NL")} km · {auto.brandstof}
                       </p>
                     </div>
-                    {/* Prijs â€” altijd rechts in bovenste rij */}
+                    {/* Prijs — altijd rechts in bovenste rij */}
                     <div className="text-right flex-shrink-0 md:mr-2">
                       <p className="text-sm md:text-base font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
-                        â‚¬{auto.prijs.toLocaleString("nl-NL")}
+                        €{auto.prijs.toLocaleString("nl-NL")}
                       </p>
                       <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
                         {auto.fotos?.length ?? 0} foto&apos;s
@@ -693,14 +768,15 @@ function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => voi
                         </button>
                       );
                     })}
-                    <Link
-                      href={`/aanbod/${auto.slug}`}
+                    <a
+                      href={`https://www.jgmobility.nl/aanbod/${auto.slug}`}
                       target="_blank"
+                      rel="noopener noreferrer"
                       className="px-3 py-1.5 text-xs font-semibold transition-all hover:opacity-70"
                       style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
                     >
                       Bekijk
-                    </Link>
+                    </a>
                     <DeleteButton id={auto.id} naam={`${auto.merk} ${auto.model}`} />
                   </div>
                 </div>
@@ -713,7 +789,7 @@ function VoorraadContent({ autos, refresh }: { autos: Auto[]; refresh: () => voi
   );
 }
 
-// â”€â”€ Facturen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Facturen ────────────────────────────────────────────────────
 type FactuurRegel = { omschrijving: string; prijs: string };
 
 type Factuur = {
@@ -792,15 +868,15 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
   const regelRijen = [
     `<tr>
       <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;color:#1e293b;font-size:10pt">${autoOmschrijving}${autoKenteken}</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">â‚¬&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
       <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt;width:60px">1</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">â‚¬&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${subtotaalExAuto.toLocaleString("nl-NL")}</td>
     </tr>`,
     ...extraRegels.map((r) => `<tr>
       <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;color:#1e293b;font-size:10pt">${r.omschrijving}</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">â‚¬&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
       <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">1</td>
-      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">â‚¬&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #e8eaf0;text-align:center;color:#1e293b;font-size:10pt">€&nbsp;${Number(r.prijs).toLocaleString("nl-NL")}</td>
     </tr>`),
   ].join("");
 
@@ -869,7 +945,7 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
         </div>
       </td>
       <td style="vertical-align:top;padding-left:120px;width:50%">
-        <div style="font-size:11pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;margin-bottom:6px">${f.klant_naam || "â€”"}</div>
+        <div style="font-size:11pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;margin-bottom:6px">${f.klant_naam || "—"}</div>
         <div style="font-size:9.5pt;color:#475569;line-height:1.75">
           ${f.klant_adres ? f.klant_adres + "<br>" : ""}
           ${[f.klant_postcode, f.klant_stad].filter(Boolean).join(" ")}${(f.klant_postcode || f.klant_stad) ? "<br>" : ""}
@@ -899,23 +975,23 @@ function genereerFactuurHTML(f: Factuur, logoSrc: string): string {
   <table style="width:270px;margin-left:auto;margin-bottom:30px;margin-top:10px">
     <tr>
       <td style="font-size:9.5pt;color:#64748b;padding:4px 0">Subtotaal</td>
-      <td style="font-size:9.5pt;color:#64748b;text-align:right;padding:4px 0">â‚¬&nbsp;${subtotaal.toLocaleString("nl-NL")}</td>
+      <td style="font-size:9.5pt;color:#64748b;text-align:right;padding:4px 0">€&nbsp;${subtotaal.toLocaleString("nl-NL")}</td>
     </tr>
     ${f.btw_type === "21"
       ? `<tr>
           <td style="font-size:9.5pt;color:#1d4ed8;padding:4px 0;border-bottom:1px solid #e2e8f0">BTW (21%)</td>
-          <td style="font-size:9.5pt;color:#1d4ed8;text-align:right;padding:4px 0;border-bottom:1px solid #e2e8f0">â‚¬&nbsp;${btwBedrag.toLocaleString("nl-NL")}</td>
+          <td style="font-size:9.5pt;color:#1d4ed8;text-align:right;padding:4px 0;border-bottom:1px solid #e2e8f0">€&nbsp;${btwBedrag.toLocaleString("nl-NL")}</td>
         </tr>`
       : `<tr><td colspan="2" style="border-bottom:1px solid #e2e8f0;padding:3px 0"></td></tr>`}
     <tr>
       <td style="font-size:12pt;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#001337;padding:9px 0 0">Eindtotaal</td>
-      <td style="font-size:12pt;font-weight:700;color:#001337;text-align:right;padding:9px 0 0">â‚¬&nbsp;${eindtotaal.toLocaleString("nl-NL")}</td>
+      <td style="font-size:12pt;font-weight:700;color:#001337;text-align:right;padding:9px 0 0">€&nbsp;${eindtotaal.toLocaleString("nl-NL")}</td>
     </tr>
   </table>
 
   <!-- Betaaltekst -->
   <div style="font-size:9pt;color:#475569;line-height:1.85;border-top:1px solid #e2e8f0;padding-top:16px;margin-bottom:12px">
-    Wij vragen u vriendelijk het bedrag van â‚¬${eindtotaal.toLocaleString("nl-NL")} ${f.vervaldatum ? `voor ${f.vervaldatum}` : "binnen 30 dagen na ontvangst"} over te maken
+    Wij vragen u vriendelijk het bedrag van €${eindtotaal.toLocaleString("nl-NL")} ${f.vervaldatum ? `voor ${f.vervaldatum}` : "binnen 30 dagen na ontvangst"} over te maken
     ${f.betaalwijze === "bank" ? "op rekening (IBAN volgt) onder vermelding van factuurnummer <strong>" + f.factuur_nr + "</strong>" : "te voldoen per contant"}.
     <br>Factuur uitgereikt door JG MOBILITY.
     ${f.btw_type === "marge" ? `<br><span style="font-size:8pt;color:#94a3b8">Op dit voertuig is de margeregeling van toepassing. BTW is niet afzonderlijk vermeld (art. 28b t/m 28h Wet OB 1968).</span>` : ""}
@@ -946,6 +1022,7 @@ function FacturenContent() {
   const [bewerkFactuur, setBewerkFactuur] = useState<Factuur | null>(null);
   const [rdwLaden, setRdwLaden] = useState(false);
   const [rdwStatus, setRdwStatus] = useState<"idle" | "gevonden" | "niet_gevonden">("idle");
+  const [periode, setPeriode] = useState<"alles" | "week" | "maand" | "kwartaal" | "jaar">("alles");
 
   const laad = useCallback(async () => {
     setLoading(true);
@@ -1123,7 +1200,7 @@ function FacturenContent() {
     fontFamily: "var(--font-inter)",
   };
 
-  // â”€â”€ Nieuwe factuur â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Nieuwe factuur ──────────────────────────────────────────
   if (view === "nieuw") {
     const secties: { titel: string; velden: { label: string; field: keyof FactuurForm; col?: number }[] }[] = [
       {
@@ -1155,14 +1232,14 @@ function FacturenContent() {
       <div>
         <PageHeader
           title={bewerkFactuur ? `Bewerken: ${bewerkFactuur.factuur_nr}` : "Nieuwe factuur"}
-          subtitle={bewerkFactuur ? "Wijzig de gegevens en sla op â€” factuurnummer blijft ongewijzigd" : "Vul de gegevens in en genereer de factuur"}
+          subtitle={bewerkFactuur ? "Wijzig de gegevens en sla op — factuurnummer blijft ongewijzigd" : "Vul de gegevens in en genereer de factuur"}
           action={
             <button
               onClick={() => { setView("lijst"); setForm(LEEG_FORM); setRegels(LEEG_REGELS); setBewerkFactuur(null); }}
               className="text-xs px-4 py-2 transition-all hover:opacity-70"
               style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)" }}
             >
-              â† Annuleer
+              ← Annuleer
             </button>
           }
         />
@@ -1184,7 +1261,7 @@ function FacturenContent() {
                 )}
                 {titel === "Voertuig" && !rdwLaden && rdwStatus === "gevonden" && (
                   <span className="text-[10px]" style={{ color: "#15803d", fontFamily: "var(--font-inter)" }}>
-                    âœ“ Gevonden via RDW
+                    ✓ Gevonden via RDW
                   </span>
                 )}
                 {titel === "Voertuig" && !rdwLaden && rdwStatus === "niet_gevonden" && (
@@ -1211,7 +1288,7 @@ function FacturenContent() {
             </div>
             <div className="p-5 grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Verkoopprijs (â‚¬)</label>
+                <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Verkoopprijs (€)</label>
                 <input type="number" {...inp("verkoopprijs")} className="w-full px-3 py-2 text-sm outline-none" style={veldStijl} />
               </div>
               <div>
@@ -1242,7 +1319,7 @@ function FacturenContent() {
           {/* Extra regels */}
           <div className="mb-5" style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
             <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(0,19,55,0.06)", backgroundColor: "rgba(0,19,55,0.02)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-wider" style={labelStijl}>Extra regels (optioneel â€” bv. banden, garantie)</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider" style={labelStijl}>Extra regels (optioneel — bv. banden, garantie)</p>
             </div>
             <div className="p-5 flex flex-col gap-3">
               {regels.map((r, i) => (
@@ -1259,7 +1336,7 @@ function FacturenContent() {
                     />
                   </div>
                   <div style={{ width: "130px" }}>
-                    {i === 0 && <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Prijs (â‚¬)</label>}
+                    {i === 0 && <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={labelStijl}>Prijs (€)</label>}
                     <input
                       type="number"
                       value={r.prijs}
@@ -1303,12 +1380,34 @@ function FacturenContent() {
     );
   }
 
-  // â”€â”€ Lijstweergave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Periode filter ──────────────────────────────────────────
+  const gefilterdeFacturen = facturen.filter((f) => {
+    if (periode === "alles") return true;
+    const [dag, maand, jaar] = (f.datum ?? "").split("-").map(Number);
+    const datum = new Date(jaar, maand - 1, dag);
+    const nu = new Date();
+    if (periode === "week") {
+      const weekGeleden = new Date(nu); weekGeleden.setDate(nu.getDate() - 7);
+      return datum >= weekGeleden;
+    }
+    if (periode === "maand") {
+      return datum.getMonth() === nu.getMonth() && datum.getFullYear() === nu.getFullYear();
+    }
+    if (periode === "kwartaal") {
+      return Math.floor(datum.getMonth() / 3) === Math.floor(nu.getMonth() / 3) && datum.getFullYear() === nu.getFullYear();
+    }
+    if (periode === "jaar") {
+      return datum.getFullYear() === nu.getFullYear();
+    }
+    return true;
+  });
+
+  // ── Lijstweergave ───────────────────────────────────────────
   return (
     <div>
       <PageHeader
         title="Facturen"
-        subtitle={`${facturen.length} facturen`}
+        subtitle={`${gefilterdeFacturen.length} facturen`}
         action={
           <button
             onClick={() => setView("nieuw")}
@@ -1341,9 +1440,29 @@ function FacturenContent() {
                 className="px-3 py-2 text-xs"
                 style={{ color: "#15803d", border: "1px solid #86efac", fontFamily: "var(--font-inter)" }}
               >
-                âœ•
+                ✕
               </button>
             </div>
+          </div>
+        )}
+        {/* Periode filter */}
+        {!loading && facturen.length > 0 && (
+          <div className="flex gap-1.5 mb-4 flex-wrap">
+            {(["week", "maand", "kwartaal", "jaar", "alles"] as const).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriode(p)}
+                className="px-3 py-1.5 text-xs font-semibold transition-all"
+                style={{
+                  backgroundColor: periode === p ? "#001337" : "transparent",
+                  color: periode === p ? "#ffffff" : "rgba(0,19,55,0.4)",
+                  border: `1px solid ${periode === p ? "#001337" : "rgba(0,19,55,0.12)"}`,
+                  fontFamily: "var(--font-inter)",
+                }}
+              >
+                {p === "kwartaal" ? "Kwrt." : p.charAt(0).toUpperCase() + p.slice(1)}
+              </button>
+            ))}
           </div>
         )}
         {loading ? (
@@ -1370,9 +1489,15 @@ function FacturenContent() {
               <Plus size={13} /> Eerste factuur aanmaken
             </button>
           </div>
+        ) : gefilterdeFacturen.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20" style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+            <FileText size={32} style={{ color: "rgba(0,19,55,0.1)" }} />
+            <p className="text-sm font-semibold mt-4" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>Geen facturen in deze periode</p>
+            <p className="text-xs mt-1" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Kies een andere periode of maak een nieuwe factuur aan.</p>
+          </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {facturen.map((f) => {
+            {gefilterdeFacturen.map((f) => {
               const s = FACTUUR_STATUS[f.status] ?? FACTUUR_STATUS.concept;
               const isOpen = openId === f.id;
               return (
@@ -1384,7 +1509,7 @@ function FacturenContent() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <p className="text-sm font-bold" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
-                          {f.factuur_nr} Â· {f.klant_naam || "Naamloos"}
+                          {f.factuur_nr} · {f.klant_naam || "Naamloos"}
                         </p>
                         <span
                           className="text-[10px] px-2 py-0.5 font-semibold"
@@ -1395,19 +1520,19 @@ function FacturenContent() {
                       </div>
                       <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
                         {[f.auto_merk, f.auto_model, f.auto_bouwjaar].filter(Boolean).join(" ")}
-                        {f.auto_kenteken ? ` Â· ${f.auto_kenteken.toUpperCase()}` : ""}
+                        {f.auto_kenteken ? ` · ${f.auto_kenteken.toUpperCase()}` : ""}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-sm font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
-                        â‚¬{Number(f.verkoopprijs).toLocaleString("nl-NL")}
+                        €{Number(f.verkoopprijs).toLocaleString("nl-NL")}
                       </p>
                       <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
-                        {f.datum} Â· {f.btw_type === "marge" ? "Marge" : "21% BTW"}
+                        {f.datum} · {f.btw_type === "marge" ? "Marge" : "21% BTW"}
                       </p>
                     </div>
                     <span className="text-xs ml-2 flex-shrink-0" style={{ color: "rgba(0,19,55,0.3)" }}>
-                      {isOpen ? "â–²" : "â–¼"}
+                      {isOpen ? "▲" : "▼"}
                     </span>
                   </button>
 
@@ -1502,7 +1627,7 @@ function FacturenContent() {
   );
 }
 
-// â”€â”€ Cosignatie â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Cosignatie ──────────────────────────────────────────────────
 type Cosignatie = {
   id: string;
   datum: string;
@@ -1576,7 +1701,7 @@ function CosignatieContent() {
     <div>
       <PageHeader
         title="Cosignatie"
-        subtitle={`${aanvragen.length} aanvragen${nieuweAanvragen > 0 ? ` Â· ${nieuweAanvragen} nieuw` : ""}`}
+        subtitle={`${aanvragen.length} aanvragen${nieuweAanvragen > 0 ? ` · ${nieuweAanvragen} nieuw` : ""}`}
       />
       <div className="p-4 md:p-8">
         {loading ? (
@@ -1633,21 +1758,21 @@ function CosignatieContent() {
                         </span>
                       </div>
                       <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
-                        {a.naam} Â· {a.email}{a.telefoon ? ` Â· ${a.telefoon}` : ""}
+                        {a.naam} · {a.email}{a.telefoon ? ` · ${a.telefoon}` : ""}
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       {a.vraagprijs && (
                         <p className="text-sm font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
-                          â‚¬{parseInt(a.vraagprijs).toLocaleString("nl-NL")}
+                          €{parseInt(a.vraagprijs).toLocaleString("nl-NL")}
                         </p>
                       )}
                       <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
-                        {a.datum} Â· {a.tijd}{a.aantal_fotos > 0 ? ` Â· ${a.aantal_fotos} foto's` : ""}
+                        {a.datum} · {a.tijd}{a.aantal_fotos > 0 ? ` · ${a.aantal_fotos} foto's` : ""}
                       </p>
                     </div>
                     <span className="text-xs ml-2 flex-shrink-0" style={{ color: "rgba(0,19,55,0.3)" }}>
-                      {isOpen ? "â–²" : "â–¼"}
+                      {isOpen ? "▲" : "▼"}
                     </span>
                   </button>
 
@@ -1661,8 +1786,8 @@ function CosignatieContent() {
                               {[
                                 ["Merk & Model", `${a.merk} ${a.model}`],
                                 ["Bouwjaar", a.bouwjaar],
-                                ["Kilometerstand", a.km ? `${parseInt(a.km).toLocaleString("nl-NL")} km` : "â€”"],
-                                ["Vraagprijs", a.vraagprijs ? `â‚¬${parseInt(a.vraagprijs).toLocaleString("nl-NL")}` : "â€”"],
+                                ["Kilometerstand", a.km ? `${parseInt(a.km).toLocaleString("nl-NL")} km` : "—"],
+                                ["Vraagprijs", a.vraagprijs ? `€${parseInt(a.vraagprijs).toLocaleString("nl-NL")}` : "—"],
                               ].map(([label, val]) => (
                                 <tr key={label}>
                                   <td className="py-1 pr-3" style={{ color: "rgba(0,19,55,0.45)", width: "110px" }}>{label}</td>
@@ -1736,7 +1861,7 @@ function CosignatieContent() {
   );
 }
 
-// â”€â”€ Marge Calculator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Marge Calculator ────────────────────────────────────────────
 const STANDAARD_KOSTEN: KostenRegel[] = [
   { label: "APK keuring", bedrag: "" },
   { label: "Reparatie / onderhoud", bedrag: "" },
@@ -1770,7 +1895,7 @@ function CalculatorPanel() {
     return (
       <div className="py-6 text-center">
         <p className="text-sm" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
-          Nog geen dossiers â€” open de Calculator tab om te starten.
+          Nog geen dossiers — open de Calculator tab om te starten.
         </p>
       </div>
     );
@@ -1791,8 +1916,8 @@ function CalculatorPanel() {
                 {d.auto_naam || "Naamloos"}
               </p>
               <p className="text-[10px] mt-0.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
-                {d.inkoop > 0 ? ("Inkoop: â‚¬" + fmtK(d.inkoop)) : "Inkoop: â€”"}
-                {" Â· "}
+                {d.inkoop > 0 ? ("Inkoop: €" + fmtK(d.inkoop)) : "Inkoop: —"}
+                {" · "}
                 {d.btw_type === "marge" ? "Marge" : "21% BTW"}
               </p>
             </div>
@@ -1800,7 +1925,7 @@ function CalculatorPanel() {
               {w !== null ? (
                 <p className="text-sm font-bold" style={{ color: w > 0 ? "#15803d" : w < 0 ? "#b91c1c" : "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)" }}>
                   {w > 0 ? "+" : ""}
-                  {"â‚¬" + fmtK(Math.abs(w))}
+                  {"€" + fmtK(Math.abs(w))}
                 </p>
               ) : (
                 <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.3)", fontFamily: "var(--font-inter)" }}>Geen verkoop</p>
@@ -1813,7 +1938,7 @@ function CalculatorPanel() {
   );
 }
 
-// â”€â”€ Interne helpers voor de calculators â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Interne helpers voor de calculators ─────────────────────────
 function useCalculatorLogic(inkoopprijs: string, btwType: "marge" | "21", verkoopprijs: string, kosten: KostenRegel[]) {
   const n = (v: string) => parseFloat(v.replace(",", ".")) || 0;
   const inkoop = n(inkoopprijs);
@@ -1846,7 +1971,7 @@ function useCalculatorLogic(inkoopprijs: string, btwType: "marge" | "21", verkoo
   return { inkoop, verkoop, totaalKostprijs, nettoWinst, btwAfdracht, breakEven, verkoopExBtw, winstPct, fmt, winststatus, n };
 }
 
-// â”€â”€ Calculator per auto (dossier beheer) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Calculator per auto (dossier beheer) ────────────────────────
 function CalculatorContent() {
   const [dossiers, setDossiers] = useState<Dossier[]>([]);
   const [actief, setActief] = useState<Dossier | null>(null);
@@ -1855,6 +1980,7 @@ function CalculatorContent() {
   const [nieuwNaam, setNieuwNaam] = useState("");
   const [mobileView, setMobileView] = useState<"lijst" | "detail">("lijst");
   const [opgeslagen, setOpgeslagen] = useState(false);
+  const [periode, setPeriode] = useState<"alles" | "week" | "maand" | "kwartaal" | "jaar">("alles");
 
   // Local edit state for the active dossier
   const [autoNaam, setAutoNaam] = useState("");
@@ -1883,9 +2009,8 @@ function CalculatorContent() {
       .then((data: Dossier[]) => {
         setDossiers(data);
         setLaden(false);
-        if (data.length > 0) openDossier(data[0]);
       });
-  }, [openDossier]);
+  }, []);
 
   // Auto-save with 700ms debounce
   useEffect(() => {
@@ -1923,19 +2048,20 @@ function CalculatorContent() {
     if (res.ok) {
       const d: Dossier = await res.json();
       setDossiers((prev) => [d, ...prev]);
-      openDossier(d);
       setNieuwNaam("");
       setToonNieuw(false);
     }
   };
 
   const verwijderDossier = async (id: number) => {
+    const naam = dossiers.find((d) => d.id === id)?.auto_naam ?? "dit dossier";
+    if (!confirm(`Weet je zeker dat je "${naam}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`)) return;
     await fetch(`/api/admin/dossiers/${id}`, { method: "DELETE" });
     const rest = dossiers.filter((d) => d.id !== id);
     setDossiers(rest);
     if (actief?.id === id) {
-      if (rest.length > 0) openDossier(rest[0]);
-      else { setActief(null); setMobileView("lijst"); }
+      setActief(null);
+      setMobileView("lijst");
     }
   };
 
@@ -1963,6 +2089,105 @@ function CalculatorContent() {
     return Math.round((ex - k) * 100) / 100;
   };
 
+  // Periode filter
+  const gefilterdeDossiers = dossiers.filter((d) => {
+    if (periode === "alles") return true;
+    const aangemaaktDatum = new Date(d.aangemaakt);
+    const nu = new Date();
+    if (periode === "week") {
+      const weekGeleden = new Date(nu); weekGeleden.setDate(nu.getDate() - 7);
+      return aangemaaktDatum >= weekGeleden;
+    }
+    if (periode === "maand") {
+      return aangemaaktDatum.getMonth() === nu.getMonth() && aangemaaktDatum.getFullYear() === nu.getFullYear();
+    }
+    if (periode === "kwartaal") {
+      const kwartaal = Math.floor(nu.getMonth() / 3);
+      const kwartaalDatum = Math.floor(aangemaaktDatum.getMonth() / 3);
+      return kwartaalDatum === kwartaal && aangemaaktDatum.getFullYear() === nu.getFullYear();
+    }
+    if (periode === "jaar") {
+      return aangemaaktDatum.getFullYear() === nu.getFullYear();
+    }
+    return true;
+  });
+
+  // Summary stats across all dossiers
+  const totaalNettoWinst = gefilterdeDossiers.reduce((s, d) => {
+    const w = calcWinstSnel(d);
+    return s + (w ?? 0);
+  }, 0);
+  const dossiersMetVerkoop = gefilterdeDossiers.filter((d) => d.verkoopprijs > 0);
+  const fmtS = (v: number) => v.toLocaleString("nl-NL", { maximumFractionDigits: 0 });
+
+  // Empty state before any dossiers
+  if (!laden && dossiers.length === 0) {
+    return (
+      <div className="flex flex-col h-full">
+        <PageHeader
+          title="Marge Calculator"
+          subtitle="Per auto bijhouden"
+          action={
+            <button
+              onClick={() => setToonNieuw((v) => !v)}
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold transition-all hover:opacity-90"
+              style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}
+            >
+              <Plus size={12} /> Nieuw dossier
+            </button>
+          }
+        />
+        {toonNieuw && (
+          <div className="px-4 md:px-8 py-4" style={{ borderBottom: "1px solid rgba(0,19,55,0.07)", backgroundColor: "#fff" }}>
+            <div className="flex gap-2 max-w-sm">
+              <input
+                autoFocus
+                type="text"
+                value={nieuwNaam}
+                onChange={(e) => setNieuwNaam(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") maakNieuwDossier();
+                  if (e.key === "Escape") setToonNieuw(false);
+                }}
+                placeholder="bijv. Fiat 500 1.2 Lounge"
+                className="flex-1 px-3 py-2 text-sm"
+                style={veld}
+              />
+              <button
+                onClick={maakNieuwDossier}
+                className="px-4 py-2 text-xs font-semibold transition-all hover:opacity-90"
+                style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}
+              >
+                Aanmaken
+              </button>
+            </div>
+          </div>
+        )}
+        <div className="flex flex-col items-center justify-center flex-1 p-8">
+          <div
+            className="flex items-center justify-center w-20 h-20 mb-6"
+            style={{ backgroundColor: "rgba(0,19,55,0.04)", borderRadius: "50%" }}
+          >
+            <Calculator size={36} style={{ color: "rgba(0,19,55,0.18)" }} />
+          </div>
+          <h3 className="text-xl font-bold mb-2" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
+            Bereken je marge
+          </h3>
+          <p className="text-sm text-center max-w-xs mb-6" style={{ color: "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)", lineHeight: 1.7 }}>
+            Maak een dossier aan per auto om inkoop, kosten en verkoopprijs bij te houden. Je ziet meteen wat je netto overhoudt na BTW.
+          </p>
+          <button
+            onClick={() => setToonNieuw(true)}
+            className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold transition-all hover:opacity-80"
+            style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}
+          >
+            <Plus size={14} /> Eerste dossier aanmaken
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full">
       <PageHeader
@@ -1972,7 +2197,7 @@ function CalculatorContent() {
           <div className="flex items-center gap-3">
             {opgeslagen && (
               <span className="text-[11px] hidden md:inline" style={{ color: "#15803d", fontFamily: "var(--font-inter)" }}>
-                Opgeslagen âœ“
+                Opgeslagen ✓
               </span>
             )}
             <button
@@ -1986,11 +2211,55 @@ function CalculatorContent() {
         }
       />
 
+      {/* Summary stats bar + periode filter */}
+      <div
+        className="px-4 md:px-6 py-2.5 flex items-center justify-between flex-shrink-0 gap-4 flex-wrap"
+        style={{ borderBottom: "1px solid rgba(0,19,55,0.07)", backgroundColor: "#f8f9fb" }}
+      >
+        {/* Stats */}
+        <div className="flex items-center gap-5 overflow-x-auto">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <span className="text-xs font-bold" style={{ color: "#001337", fontFamily: "var(--font-inter)" }}>{gefilterdeDossiers.length}</span>
+            <span className="text-[10px]" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>dossier{gefilterdeDossiers.length !== 1 ? "s" : ""}</span>
+          </div>
+          <div className="w-px h-3 flex-shrink-0" style={{ backgroundColor: "rgba(0,19,55,0.1)" }} />
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <span className="text-xs font-bold" style={{ color: dossiersMetVerkoop.length > 0 && totaalNettoWinst >= 0 ? "#15803d" : dossiersMetVerkoop.length > 0 ? "#b91c1c" : "#001337", fontFamily: "var(--font-inter)" }}>
+              {dossiersMetVerkoop.length > 0 ? ((totaalNettoWinst >= 0 ? "+" : "−") + " €" + fmtS(Math.abs(totaalNettoWinst))) : "—"}
+            </span>
+            <span className="text-[10px]" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>netto winst</span>
+          </div>
+          <div className="w-px h-3 flex-shrink-0" style={{ backgroundColor: "rgba(0,19,55,0.1)" }} />
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <span className="text-xs font-bold" style={{ color: "#001337", fontFamily: "var(--font-inter)" }}>{dossiersMetVerkoop.length}</span>
+            <span className="text-[10px]" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>verkopen</span>
+          </div>
+        </div>
+        {/* Periode knoppen */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {(["week", "maand", "kwartaal", "jaar", "alles"] as const).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPeriode(p)}
+              className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide transition-all"
+              style={{
+                fontFamily: "var(--font-inter)",
+                backgroundColor: periode === p ? "#001337" : "transparent",
+                color: periode === p ? "#ffffff" : "rgba(0,19,55,0.4)",
+                border: `1px solid ${periode === p ? "#001337" : "rgba(0,19,55,0.12)"}`,
+              }}
+            >
+              {p === "kwartaal" ? "Kwrt." : p.charAt(0).toUpperCase() + p.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="flex flex-1 overflow-hidden">
-        {/* â”€â”€ Zijbalk: dossier lijst â”€â”€ */}
+        {/* ── Zijbalk: dossier lijst ── */}
         <aside
           className={`${mobileView === "detail" ? "hidden md:flex" : "flex"} flex-col flex-shrink-0`}
-          style={{ width: "210px", borderRight: "1px solid rgba(0,19,55,0.08)", backgroundColor: "#f8f9fb" }}
+          style={{ width: "220px", borderRight: "1px solid rgba(0,19,55,0.08)", backgroundColor: "#f8f9fb" }}
         >
           {/* Nieuw dossier formulier */}
           {toonNieuw && (
@@ -2022,19 +2291,14 @@ function CalculatorContent() {
           <div className="flex-1 overflow-y-auto">
             {laden ? (
               <p className="p-4 text-xs" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Laden...</p>
-            ) : dossiers.length === 0 ? (
+            ) : gefilterdeDossiers.length === 0 ? (
               <div className="p-4 text-center">
-                <p className="text-xs mb-3" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>Nog geen dossiers</p>
-                <button
-                  onClick={() => setToonNieuw(true)}
-                  className="text-xs underline transition-all hover:opacity-70"
-                  style={{ color: "#001337", fontFamily: "var(--font-inter)" }}
-                >
-                  Eerste dossier maken
-                </button>
+                <p className="text-xs" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
+                  Geen dossiers in deze periode
+                </p>
               </div>
             ) : (
-              dossiers.map((d) => {
+              gefilterdeDossiers.map((d) => {
                 const w = calcWinstSnel(d);
                 const isActief = actief?.id === d.id;
                 return (
@@ -2042,7 +2306,7 @@ function CalculatorContent() {
                     key={d.id}
                     className="group relative cursor-pointer"
                     style={{
-                      borderLeft: `2px solid ${isActief ? "#001337" : "transparent"}`,
+                      borderLeft: `3px solid ${isActief ? "#001337" : "transparent"}`,
                       borderBottom: "1px solid rgba(0,19,55,0.05)",
                       backgroundColor: isActief ? "#ffffff" : "transparent",
                     }}
@@ -2053,14 +2317,20 @@ function CalculatorContent() {
                         {d.auto_naam || "Naamloos"}
                       </p>
                       <p className="text-[10px] mt-0.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
-                        {d.inkoop > 0 ? ("â‚¬" + d.inkoop.toLocaleString("nl-NL")) : "Inkoop: â€”"}
+                        {d.inkoop > 0 ? ("Inkoop: €" + d.inkoop.toLocaleString("nl-NL")) : "Inkoop: —"}
                       </p>
                       {w !== null ? (
-                        <p className="text-[11px] font-semibold mt-1" style={{ color: w > 0 ? "#15803d" : w < 0 ? "#b91c1c" : "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
-                          {w > 0 ? "+" : ""}{"â‚¬" + Math.abs(w).toLocaleString("nl-NL", { maximumFractionDigits: 0 })}
-                        </p>
+                        <div className="inline-flex items-center mt-1.5 px-2 py-0.5"
+                          style={{
+                            backgroundColor: w > 0 ? "rgba(21,128,61,0.1)" : w < 0 ? "rgba(185,28,28,0.08)" : "rgba(0,19,55,0.05)",
+                            borderRadius: "3px",
+                          }}>
+                          <span className="text-[10px] font-bold" style={{ color: w > 0 ? "#15803d" : w < 0 ? "#b91c1c" : "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>
+                            {w > 0 ? "+" : w < 0 ? "−" : ""}{"€" + Math.abs(w).toLocaleString("nl-NL", { maximumFractionDigits: 0 })}
+                          </span>
+                        </div>
                       ) : (
-                        <p className="text-[10px] mt-0.5" style={{ color: "rgba(0,19,55,0.3)", fontFamily: "var(--font-inter)" }}>Geen verkoop</p>
+                        <p className="text-[10px] mt-1" style={{ color: "rgba(0,19,55,0.28)", fontFamily: "var(--font-inter)" }}>Geen verkoop</p>
                       )}
                     </div>
                     <button
@@ -2077,7 +2347,7 @@ function CalculatorContent() {
           </div>
         </aside>
 
-        {/* â”€â”€ Calculator paneel â”€â”€ */}
+        {/* ── Calculator paneel ── */}
         <div
           className={`${mobileView === "lijst" ? "hidden md:flex" : "flex"} flex-col flex-1 overflow-y-auto`}
         >
@@ -2085,10 +2355,10 @@ function CalculatorContent() {
             <div className="flex flex-col items-center justify-center flex-1 py-20 px-8">
               <Calculator size={36} style={{ color: "rgba(0,19,55,0.1)" }} />
               <p className="text-base font-bold mt-4 mb-2" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
-                Geen dossier geselecteerd
+                Selecteer een dossier
               </p>
-              <p className="text-sm text-center mb-5" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
-                Maak een nieuw dossier aan via de knop rechtsboven
+              <p className="text-sm text-center" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
+                Kies een auto in de lijst links
               </p>
             </div>
           ) : (
@@ -2099,7 +2369,7 @@ function CalculatorContent() {
                 style={{ color: "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)" }}
                 onClick={() => setMobileView("lijst")}
               >
-                â† Terug naar overzicht
+                ← Terug naar overzicht
               </button>
 
               <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
@@ -2129,7 +2399,7 @@ function CalculatorContent() {
                     </div>
                     <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Inkoopprijs (â‚¬)</label>
+                        <label className="block text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Inkoopprijs (€)</label>
                         <input type="number" value={inkoopprijs} onChange={(e) => setInkoopprijs(e.target.value)}
                           placeholder="bijv. 8500" className="w-full px-3 py-2.5 text-sm" style={veld} />
                       </div>
@@ -2160,7 +2430,7 @@ function CalculatorContent() {
                           <input type="text" value={k.label} onChange={(e) => updateRegel(i, "label", e.target.value)}
                             placeholder="Omschrijving" className="flex-1 px-3 py-2 text-sm" style={veld} />
                           <div className="relative" style={{ width: "110px" }}>
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>â‚¬</span>
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>€</span>
                             <input type="number" value={k.bedrag} onChange={(e) => updateRegel(i, "bedrag", e.target.value)}
                               placeholder="0" className="w-full pl-8 pr-3 py-2 text-sm" style={veld} />
                           </div>
@@ -2183,7 +2453,7 @@ function CalculatorContent() {
                     </div>
                     <div className="p-5">
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>â‚¬</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>€</span>
                         <input type="number" value={verkoopprijs} onChange={(e) => setVerkoopprijs(e.target.value)}
                           placeholder={calc.breakEven > 0 ? ("Min. " + Math.ceil(calc.breakEven).toLocaleString("nl-NL") + " voor break-even") : "bijv. 11500"}
                           className="w-full pl-12 pr-3 py-2.5 text-sm" style={veld} />
@@ -2204,22 +2474,22 @@ function CalculatorContent() {
                         <tbody>
                           <tr>
                             <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Inkoopprijs</td>
-                            <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{calc.inkoop > 0 ? ("â‚¬ " + calc.fmt(calc.inkoop)) : "---"}</td>
+                            <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{calc.inkoop > 0 ? ("€ " + calc.fmt(calc.inkoop)) : "---"}</td>
                           </tr>
                           {kosten.filter((k) => calc.n(k.bedrag) > 0).map((k, i) => (
                             <tr key={i}>
                               <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>{k.label || "Kosten"}</td>
-                              <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"â‚¬ " + calc.fmt(calc.n(k.bedrag))}</td>
+                              <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + calc.fmt(calc.n(k.bedrag))}</td>
                             </tr>
                           ))}
                           <tr style={{ borderTop: "1px solid rgba(0,19,55,0.08)" }}>
                             <td className="pt-3 pb-1 font-bold" style={{ color: "#001337" }}>Totale kostprijs</td>
-                            <td className="pt-3 pb-1 text-right font-bold" style={{ color: "#001337" }}>{calc.totaalKostprijs > 0 ? ("â‚¬ " + calc.fmt(calc.totaalKostprijs)) : "---"}</td>
+                            <td className="pt-3 pb-1 text-right font-bold" style={{ color: "#001337" }}>{calc.totaalKostprijs > 0 ? ("€ " + calc.fmt(calc.totaalKostprijs)) : "---"}</td>
                           </tr>
                           {calc.breakEven > 0 && (
                             <tr>
                               <td className="py-1" style={{ color: "rgba(0,19,55,0.45)", fontSize: "11px" }}>Break-even verkoopprijs</td>
-                              <td className="py-1 text-right" style={{ color: "rgba(0,19,55,0.45)", fontSize: "11px" }}>{"â‚¬ " + calc.fmt(calc.breakEven)}</td>
+                              <td className="py-1 text-right" style={{ color: "rgba(0,19,55,0.45)", fontSize: "11px" }}>{"€ " + calc.fmt(calc.breakEven)}</td>
                             </tr>
                           )}
                         </tbody>
@@ -2244,30 +2514,30 @@ function CalculatorContent() {
                           <tbody>
                             <tr>
                               <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Verkoopprijs</td>
-                              <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"â‚¬ " + calc.fmt(calc.verkoop)}</td>
+                              <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + calc.fmt(calc.verkoop)}</td>
                             </tr>
                             {btwType === "marge" && calc.verkoop > 0 && (
                               <tr>
                                 <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Bruto marge</td>
-                                <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"â‚¬ " + calc.fmt(calc.verkoop - calc.totaalKostprijs)}</td>
+                                <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + calc.fmt(calc.verkoop - calc.totaalKostprijs)}</td>
                               </tr>
                             )}
                             {btwType === "21" && (
                               <tr>
                                 <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>Excl. BTW</td>
-                                <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"â‚¬ " + calc.fmt(calc.verkoopExBtw)}</td>
+                                <td className="py-1.5 text-right font-semibold" style={{ color: "#001337" }}>{"€ " + calc.fmt(calc.verkoopExBtw)}</td>
                               </tr>
                             )}
                             <tr>
                               <td className="py-1.5" style={{ color: "rgba(0,19,55,0.55)" }}>{btwType === "marge" ? "BTW afdragen (op marge)" : "BTW afdragen (21%)"}</td>
                               <td className="py-1.5 text-right font-semibold" style={{ color: calc.btwAfdracht > 0 ? "#b45309" : "rgba(0,19,55,0.55)" }}>
-                                {calc.btwAfdracht > 0 ? ("âˆ’ â‚¬ " + calc.fmt(calc.btwAfdracht)) : "â‚¬ 0,00"}
+                                {calc.btwAfdracht > 0 ? ("− € " + calc.fmt(calc.btwAfdracht)) : "€ 0,00"}
                               </td>
                             </tr>
                             <tr style={{ borderTop: ("2px solid " + (calc.winststatus === "winst" ? "#86efac" : calc.winststatus === "verlies" ? "#fecaca" : "rgba(0,19,55,0.12)")) }}>
                               <td className="pt-3 font-bold text-base" style={{ color: "#001337" }}>Netto winst</td>
                               <td className="pt-3 text-right font-bold text-base" style={{ color: calc.winststatus === "winst" ? "#15803d" : calc.winststatus === "verlies" ? "#b91c1c" : "#001337" }}>
-                                {(calc.nettoWinst >= 0 ? "" : "- ") + "â‚¬ " + calc.fmt(Math.abs(calc.nettoWinst))}
+                                {(calc.nettoWinst >= 0 ? "" : "- ") + "€ " + calc.fmt(Math.abs(calc.nettoWinst))}
                               </td>
                             </tr>
                             {calc.winstPct !== 0 && (
@@ -2287,7 +2557,7 @@ function CalculatorContent() {
                   {calc.totaalKostprijs > 0 && calc.verkoop === 0 && (
                     <div className="px-4 py-3 text-xs" style={{ backgroundColor: "rgba(0,19,55,0.03)", border: "1px solid rgba(0,19,55,0.07)", color: "rgba(0,19,55,0.5)", fontFamily: "var(--font-inter)", lineHeight: 1.7 }}>
                       Vul een verkoopprijs in om je winst te berekenen.<br />
-                      <strong style={{ color: "#001337" }}>{"Break-even: â‚¬ " + calc.fmt(calc.breakEven)}</strong>
+                      <strong style={{ color: "#001337" }}>{"Break-even: € " + calc.fmt(calc.breakEven)}</strong>
                     </div>
                   )}
                 </div>
