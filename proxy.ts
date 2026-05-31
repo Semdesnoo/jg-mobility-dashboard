@@ -4,7 +4,7 @@ const DASHBOARD_URL = "https://jg-mobility-dashboard.vercel.app";
 // "website" = public website only, "dashboard" = admin only
 const role = process.env.DEPLOYMENT_ROLE ?? "website";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (role === "website") {
