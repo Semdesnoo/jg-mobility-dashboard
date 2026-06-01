@@ -29,6 +29,7 @@ import AfsprakenContent from "./AfsprakenContent";
 import InkoopContent from "./InkoopContent";
 import LeadsContent from "./LeadsContent";
 import StatistiekenContent from "./StatistiekenContent";
+import CosignatieContent from "./CosignatieContent";
 
 type Tab = "dashboard" | "email" | "voorraad" | "cosignatie" | "social" | "facturen" | "calculator" | "klanten" | "afspraken" | "inkoop" | "leads" | "statistieken";
 
@@ -356,17 +357,17 @@ export default function DashboardHub() {
       {/* ── Mobiele hub (full-screen overlay) ── */}
       {mobileHub && (
         <div
-          className="md:hidden fixed inset-0 z-50 overflow-y-auto flex flex-col"
+          className="md:hidden fixed inset-0 z-50 flex flex-col overflow-hidden"
           style={{ backgroundColor: "#f0f2f5" }}
         >
-          {/* Header */}
-          <div style={{ backgroundColor: "#001337" }} className="px-6 pt-10 pb-8">
-            <div className="flex items-start justify-between mb-6">
+          {/* Header — compact */}
+          <div style={{ backgroundColor: "#001337" }} className="px-5 pt-8 pb-4 flex-shrink-0">
+            <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-[10px] tracking-widest uppercase mb-1" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-inter)" }}>
+                <p className="text-[9px] tracking-widest uppercase mb-0.5" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-inter)" }}>
                   Beheer
                 </p>
-                <h1 className="text-2xl font-bold text-white" style={{ fontFamily: "var(--font-playfair)" }}>
+                <h1 className="text-xl font-bold text-white" style={{ fontFamily: "var(--font-playfair)" }}>
                   JG Mobility
                 </h1>
               </div>
@@ -381,50 +382,38 @@ export default function DashboardHub() {
                 </button>
               </form>
             </div>
-            <div>
-              <p className="text-base font-semibold text-white mb-0.5" style={{ fontFamily: "var(--font-inter)" }}>
-                Welkom terug
-              </p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-inter)" }}>
-                {new Date().toLocaleDateString("nl-NL", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-              </p>
+            {/* Snelle stats */}
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: "Beschikbaar", value: beschikbaar.length },
+                { label: "Verkocht", value: verkocht.length },
+                { label: "Totaal", value: autos.length },
+              ].map((s) => (
+                <div key={s.label} className="flex flex-col items-center justify-center py-2" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+                  <p className="text-lg font-bold text-white" style={{ fontFamily: "var(--font-playfair)" }}>{s.value}</p>
+                  <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-inter)" }}>{s.label}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Snelle stats */}
-          <div className="px-4 pt-5 pb-2 grid grid-cols-3 gap-2">
-            {[
-              { label: "Beschikbaar", value: beschikbaar.length },
-              { label: "Verkocht", value: verkocht.length },
-              { label: "Totaal", value: autos.length },
-            ].map((s) => (
-              <div key={s.label} className="flex flex-col items-center justify-center py-3" style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
-                <p className="text-xl font-bold" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>{s.value}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>{s.label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Nav kaarten */}
-          <div className="px-4 pt-3 pb-8 grid grid-cols-2 gap-3">
+          {/* Nav kaarten — 3 kolommen, past altijd op scherm */}
+          <div className="flex-1 px-3 pt-3 pb-3 grid grid-cols-3 gap-2 content-start overflow-hidden">
             {NAV.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => { setTab(id); setMobileHub(false); }}
-                className="flex flex-col items-start p-4 text-left transition-all active:scale-95"
+                className="flex flex-col items-center justify-center py-3 px-1 text-center transition-all active:scale-95"
                 style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}
               >
                 <div
-                  className="flex items-center justify-center mb-3"
-                  style={{ width: "40px", height: "40px", backgroundColor: "rgba(0,19,55,0.05)" }}
+                  className="flex items-center justify-center mb-1.5"
+                  style={{ width: "32px", height: "32px", backgroundColor: "rgba(0,19,55,0.05)" }}
                 >
-                  <Icon size={18} style={{ color: "#001337" }} />
+                  <Icon size={15} style={{ color: "#001337" }} />
                 </div>
-                <p className="text-sm font-bold mb-1" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
+                <p className="text-[11px] font-bold leading-tight" style={{ color: "#001337", fontFamily: "var(--font-inter)" }}>
                   {label}
-                </p>
-                <p className="text-[11px] leading-snug" style={{ color: "rgba(0,19,55,0.42)", fontFamily: "var(--font-inter)" }}>
-                  {NAV_META[id]}
                 </p>
               </button>
             ))}
@@ -1972,240 +1961,6 @@ function FacturenContent() {
                               {f.notitie}
                             </div>
                           )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ── Cosignatie ──────────────────────────────────────────────────
-type Cosignatie = {
-  id: string;
-  datum: string;
-  tijd: string;
-  naam: string;
-  email: string;
-  telefoon: string;
-  merk: string;
-  model: string;
-  bouwjaar: string;
-  km: string;
-  vraagprijs: string;
-  opmerking: string;
-  aantal_fotos: number;
-  status: string;
-  notitie: string;
-};
-
-const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  nieuw:          { label: "Nieuw",          color: "#b45309", bg: "#fef3c7" },
-  in_behandeling: { label: "In behandeling", color: "#1d4ed8", bg: "#dbeafe" },
-  geaccepteerd:   { label: "Geaccepteerd",   color: "#15803d", bg: "#dcfce7" },
-  afgewezen:      { label: "Afgewezen",      color: "#b91c1c", bg: "#fee2e2" },
-};
-
-function CosignatieContent() {
-  const [aanvragen, setAanvragen] = useState<Cosignatie[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  const laad = useCallback(async () => {
-    setLoading(true);
-    const res = await fetch("/api/admin/cosignaties");
-    if (res.ok) setAanvragen(await res.json());
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { laad(); }, [laad]);
-
-  const updateStatus = async (id: string, status: string) => {
-    setSaving(true);
-    await fetch(`/api/admin/cosignaties/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    setAanvragen((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
-    setSaving(false);
-  };
-
-  const updateNotitie = async (id: string, notitie: string) => {
-    await fetch(`/api/admin/cosignaties/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ notitie }),
-    });
-    setAanvragen((prev) => prev.map((a) => (a.id === id ? { ...a, notitie } : a)));
-  };
-
-  const verwijder = async (id: string) => {
-    if (!confirm("Aanvraag verwijderen?")) return;
-    await fetch(`/api/admin/cosignaties/${id}`, { method: "DELETE" });
-    setAanvragen((prev) => prev.filter((a) => a.id !== id));
-    if (openId === id) setOpenId(null);
-  };
-
-  const nieuweAanvragen = aanvragen.filter((a) => a.status === "nieuw").length;
-
-  return (
-    <div>
-      <PageHeader
-        title="Cosignatie"
-        subtitle={`${aanvragen.length} aanvragen${nieuweAanvragen > 0 ? ` · ${nieuweAanvragen} nieuw` : ""}`}
-      />
-      <div className="p-4 md:p-8">
-        {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <div
-              className="w-6 h-6 rounded-full border-2 animate-spin"
-              style={{ borderColor: "rgba(0,19,55,0.1)", borderTopColor: "#001337" }}
-            />
-          </div>
-        ) : aanvragen.length === 0 ? (
-          <div
-            className="flex flex-col items-center justify-center py-28"
-            style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}
-          >
-            <Handshake size={40} style={{ color: "rgba(0,19,55,0.1)" }} />
-            <p
-              className="text-lg font-bold mt-5 mb-2"
-              style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}
-            >
-              Nog geen aanvragen
-            </p>
-            <p
-              className="text-sm"
-              style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}
-            >
-              Ingestuurde cosignatie-aanvragen verschijnen hier automatisch.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {aanvragen.map((a) => {
-              const s = STATUS_LABELS[a.status] ?? STATUS_LABELS.nieuw;
-              const isOpen = openId === a.id;
-              return (
-                <div
-                  key={a.id}
-                  style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}
-                >
-                  <button
-                    onClick={() => setOpenId(isOpen ? null : a.id)}
-                    className="w-full flex items-center gap-4 px-5 py-4 text-left transition-all hover:bg-gray-50"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <p className="text-sm font-bold" style={{ color: "#001337", fontFamily: "var(--font-playfair)" }}>
-                          {a.merk} {a.model}{" "}
-                          <span style={{ fontWeight: 400, color: "rgba(0,19,55,0.5)" }}>{a.bouwjaar}</span>
-                        </p>
-                        <span
-                          className="text-[10px] px-2 py-0.5 font-semibold"
-                          style={{ backgroundColor: s.bg, color: s.color, fontFamily: "var(--font-inter)" }}
-                        >
-                          {s.label}
-                        </span>
-                      </div>
-                      <p className="text-xs" style={{ color: "rgba(0,19,55,0.45)", fontFamily: "var(--font-inter)" }}>
-                        {a.naam} · {a.email}{a.telefoon ? ` · ${a.telefoon}` : ""}
-                      </p>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      {a.vraagprijs && (
-                        <p className="text-sm font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>
-                          €{parseInt(a.vraagprijs).toLocaleString("nl-NL")}
-                        </p>
-                      )}
-                      <p className="text-[10px]" style={{ color: "rgba(0,19,55,0.35)", fontFamily: "var(--font-inter)" }}>
-                        {a.datum} · {a.tijd}{a.aantal_fotos > 0 ? ` · ${a.aantal_fotos} foto's` : ""}
-                      </p>
-                    </div>
-                    <span className="text-xs ml-2 flex-shrink-0" style={{ color: "rgba(0,19,55,0.3)" }}>
-                      {isOpen ? "▲" : "▼"}
-                    </span>
-                  </button>
-
-                  {isOpen && (
-                    <div className="px-5 pb-5" style={{ borderTop: "1px solid rgba(0,19,55,0.06)" }}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
-                        <div>
-                          <p className="text-xs font-bold mb-2 uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Auto</p>
-                          <table className="w-full text-xs" style={{ fontFamily: "var(--font-inter)" }}>
-                            <tbody>
-                              {[
-                                ["Merk & Model", `${a.merk} ${a.model}`],
-                                ["Bouwjaar", a.bouwjaar],
-                                ["Kilometerstand", a.km ? `${parseInt(a.km).toLocaleString("nl-NL")} km` : "—"],
-                                ["Vraagprijs", a.vraagprijs ? `€${parseInt(a.vraagprijs).toLocaleString("nl-NL")}` : "—"],
-                              ].map(([label, val]) => (
-                                <tr key={label}>
-                                  <td className="py-1 pr-3" style={{ color: "rgba(0,19,55,0.45)", width: "110px" }}>{label}</td>
-                                  <td className="py-1 font-semibold" style={{ color: "#001337" }}>{val}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                          {a.opmerking && (
-                            <div className="mt-3 p-3 text-xs" style={{ backgroundColor: "rgba(0,19,55,0.03)", border: "1px solid rgba(0,19,55,0.07)", color: "rgba(0,19,55,0.65)", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}>
-                              {a.opmerking}
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold mb-2 uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Status</p>
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {Object.entries(STATUS_LABELS).map(([key, val]) => (
-                              <button
-                                key={key}
-                                disabled={saving}
-                                onClick={() => updateStatus(a.id, key)}
-                                className="px-3 py-1 text-xs font-semibold transition-all"
-                                style={{
-                                  backgroundColor: a.status === key ? val.bg : "transparent",
-                                  color: a.status === key ? val.color : "rgba(0,19,55,0.4)",
-                                  border: `1px solid ${a.status === key ? val.color : "rgba(0,19,55,0.15)"}`,
-                                  fontFamily: "var(--font-inter)",
-                                }}
-                              >
-                                {val.label}
-                              </button>
-                            ))}
-                          </div>
-                          <p className="text-xs font-bold mb-1.5 uppercase tracking-wider" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)" }}>Notitie</p>
-                          <textarea
-                            defaultValue={a.notitie}
-                            rows={3}
-                            onBlur={(e) => updateNotitie(a.id, e.target.value)}
-                            placeholder="Interne notitie..."
-                            className="w-full px-3 py-2 text-xs outline-none resize-none"
-                            style={{ backgroundColor: "rgba(0,19,55,0.02)", border: "1px solid rgba(0,19,55,0.12)", color: "#001337", fontFamily: "var(--font-inter)", lineHeight: 1.6 }}
-                          />
-                          <div className="flex justify-between items-center mt-3">
-                            <a
-                              href={`mailto:${a.email}`}
-                              className="text-xs font-semibold transition-all hover:opacity-70"
-                              style={{ backgroundColor: "#001337", color: "#ffffff", padding: "6px 14px", fontFamily: "var(--font-inter)" }}
-                            >
-                              Mail {a.naam.split(" ")[0]}
-                            </a>
-                            <button
-                              onClick={() => verwijder(a.id)}
-                              className="text-xs transition-all hover:opacity-70"
-                              style={{ color: "#b91c1c", fontFamily: "var(--font-inter)" }}
-                            >
-                              Verwijder
-                            </button>
-                          </div>
                         </div>
                       </div>
                     </div>
