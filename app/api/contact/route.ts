@@ -38,6 +38,12 @@ export async function POST(req: NextRequest) {
           </div>
         `,
       });
+      // Auto-lead aanmaken vanuit afspraakverzoek
+      await sql`
+        INSERT INTO leads (id, telefoon, email, bron, interesse, notitie, status)
+        VALUES (${`lead_apt_${Date.now()}`}, ${telefoon ?? ""}, ${email ?? ""},
+                ${"website"}, ${"Afspraakverzoek"}, ${`Datum: ${datum} om ${tijd}`}, ${"nieuw"})
+      `.catch(() => null);
       return NextResponse.json({ ok: true });
     }
 
@@ -68,6 +74,13 @@ export async function POST(req: NextRequest) {
         </div>
       `,
     });
+
+    // Auto-lead aanmaken vanuit contactformulier
+    await sql`
+      INSERT INTO leads (id, naam, telefoon, email, bron, interesse, notitie, status)
+      VALUES (${`lead_contact_${Date.now()}`}, ${naam ?? ""}, ${telefoon ?? ""}, ${email ?? ""},
+              ${"website"}, ${"Contactformulier"}, ${bericht ?? ""}, ${"nieuw"})
+    `.catch(() => null);
 
     return NextResponse.json({ ok: true });
   }
@@ -142,6 +155,13 @@ export async function POST(req: NextRequest) {
       INSERT INTO cosignaties (id, datum, tijd, naam, email, telefoon, merk, model, bouwjaar, km, vraagprijs, opmerking, aantal_fotos)
       VALUES (${id}, ${datum}, ${tijd}, ${naam ?? ""}, ${email ?? ""}, ${telefoon ?? ""}, ${merk ?? ""}, ${model ?? ""}, ${bouwjaar ?? ""}, ${km ?? ""}, ${vraagprijs ?? ""}, ${opmerking ?? ""}, ${fotos.length})
     `;
+    // Auto-lead aanmaken vanuit cosignatie
+    await sql`
+      INSERT INTO leads (id, naam, telefoon, email, bron, interesse, notitie, status)
+      VALUES (${`lead_cos_${Date.now()}`}, ${naam ?? ""}, ${telefoon ?? ""}, ${email ?? ""},
+              ${"cosignatie"}, ${`${merk ?? ""} ${model ?? ""}`.trim()},
+              ${opmerking ?? ""}, ${"nieuw"})
+    `.catch(() => null);
   } catch {
     // DB opslaan mislukt → mail is al verstuurd, geen blocker
   }
