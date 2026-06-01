@@ -12,6 +12,7 @@
 
 * {
   box-sizing: border-box;
+  max-width: 100%;
 }
 
 html {
@@ -24,4 +25,13 @@ body {
   color: #1a1a1a;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+/* Admin: geen zoom of horizontaal scrollen */
+body:has(.admin-root) {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: pan-y;
+  height: 100%;
+  width: 100%;
 }
