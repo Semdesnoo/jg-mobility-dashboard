@@ -15,11 +15,22 @@ import {
   ExternalLink,
   Calculator,
   Trash2,
+  Users,
+  Calendar,
+  TrendingDown,
+  Target,
+  BarChart2,
+  Search,
 } from "lucide-react";
 import GmailWidget from "./GmailWidget";
 import DeleteButton from "./DeleteButton";
+import KlantenContent from "./KlantenContent";
+import AfsprakenContent from "./AfsprakenContent";
+import InkoopContent from "./InkoopContent";
+import LeadsContent from "./LeadsContent";
+import StatistiekenContent from "./StatistiekenContent";
 
-type Tab = "dashboard" | "email" | "voorraad" | "cosignatie" | "social" | "facturen" | "calculator";
+type Tab = "dashboard" | "email" | "voorraad" | "cosignatie" | "social" | "facturen" | "calculator" | "klanten" | "afspraken" | "inkoop" | "leads" | "statistieken";
 
 type Auto = {
   id: number;
@@ -53,10 +64,15 @@ const NAV: { id: Tab; label: string; icon: React.ComponentType<IconProps> }[] = 
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "email", label: "Email", icon: Mail },
   { id: "voorraad", label: "Auto Voorraad", icon: Car },
+  { id: "leads", label: "Leads", icon: Target },
+  { id: "klanten", label: "Klanten", icon: Users },
+  { id: "afspraken", label: "Afspraken", icon: Calendar },
+  { id: "inkoop", label: "Inkoop & Taxatie", icon: TrendingDown },
   { id: "cosignatie", label: "Cosignatie", icon: Handshake },
-  { id: "social", label: "Social Media", icon: Share2 },
   { id: "facturen", label: "Facturen", icon: FileText },
   { id: "calculator", label: "Calculator", icon: Calculator },
+  { id: "statistieken", label: "Statistieken", icon: BarChart2 },
+  { id: "social", label: "Social Media", icon: Share2 },
 ];
 
 function PageHeader({
@@ -157,13 +173,18 @@ function PlaceholderTab({
 }
 
 const NAV_META: Record<Tab, string> = {
-  dashboard:   "Overzicht & voorraadstatus",
-  email:       "Berichten & klantcontact",
-  voorraad:    "Beheer je auto's",
-  cosignatie:  "Aanvragen & deals",
-  social:      "Posts & marketing",
-  facturen:    "Maak en beheer facturen",
-  calculator:  "Bereken marge per auto",
+  dashboard:    "Overzicht & voorraadstatus",
+  email:        "Berichten & klantcontact",
+  voorraad:     "Beheer je auto's",
+  leads:        "Opvolgen & converteren",
+  klanten:      "CRM & contactbeheer",
+  afspraken:    "Proefritten & bezichtigingen",
+  inkoop:       "Taxaties & aankopen",
+  cosignatie:   "Aanvragen & deals",
+  facturen:     "Maak en beheer facturen",
+  calculator:   "Bereken marge per auto",
+  statistieken: "Omzet & prestaties",
+  social:       "Posts & marketing",
 };
 
 export default function DashboardHub() {
@@ -314,8 +335,15 @@ export default function DashboardHub() {
           />
         )}
         {tab === "email" && <EmailContent />}
-        {tab === "voorraad" && <VoorraadContent autos={autos} refresh={refresh} />}
+        {tab === "voorraad" && <VoorraadContent autos={autos} refresh={refresh} setTab={setTab} setMobileHub={setMobileHub} />}
+        {tab === "leads" && <LeadsContent />}
+        {tab === "klanten" && <KlantenContent />}
+        {tab === "afspraken" && <AfsprakenContent />}
+        {tab === "inkoop" && <InkoopContent />}
         {tab === "cosignatie" && <CosignatieContent />}
+        {tab === "facturen" && <FacturenContent />}
+        {tab === "calculator" && <CalculatorContent />}
+        {tab === "statistieken" && <StatistiekenContent />}
         {tab === "social" && (
           <PlaceholderTab
             icon={Share2}
@@ -323,8 +351,6 @@ export default function DashboardHub() {
             description="Plan en beheer posts voor Instagram, Facebook en andere platforms. Koppeling via Mobilox of eigen integratie."
           />
         )}
-        {tab === "facturen" && <FacturenContent />}
-        {tab === "calculator" && <CalculatorContent />}
       </main>
 
       {/* ── Mobiele hub (full-screen overlay) ── */}
@@ -487,6 +513,9 @@ function DashboardContent({
             </div>
           </div>
         </div>
+
+        {/* Kenteken check */}
+        <KentekenWidget />
 
         {/* Voorraad — volle breedte */}
         <div>
@@ -2895,6 +2924,85 @@ function CalculatorContent() {
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Kenteken Check Widget ────────────────────────────────────────
+function KentekenWidget() {
+  const [kenteken, setKenteken] = useState("");
+  const [laden, setLaden] = useState(false);
+  const [resultaat, setResultaat] = useState<Record<string, string> | null>(null);
+  const [fout, setFout] = useState<string | null>(null);
+
+  const zoek = async () => {
+    if (!kenteken.trim()) return;
+    setLaden(true);
+    setResultaat(null);
+    setFout(null);
+    const res = await fetch(`/api/admin/rdw-lookup?kenteken=${encodeURIComponent(kenteken.trim())}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Object.keys(data).length > 0) setResultaat(data);
+      else setFout("Kenteken niet gevonden");
+    } else {
+      setFout("Fout bij ophalen RDW-data");
+    }
+    setLaden(false);
+  };
+
+  const velden: [string, string][] = resultaat ? [
+    ["Merk", resultaat.merk],
+    ["Handelsbenaming", resultaat.handelsbenaming],
+    ["1e toelating", resultaat.datum_eerste_toelating?.slice(0, 4)],
+    ["Brandstof", resultaat.brandstof_omschrijving],
+    ["Kleur", resultaat.eerste_kleur],
+    ["Carrosserie", resultaat.inrichting],
+    ["Cilinderinhoud", resultaat.cilinderinhoud ? `${resultaat.cilinderinhoud} cc` : ""],
+    ["Vermogen", resultaat.nettomaximumvermogen ? `${resultaat.nettomaximumvermogen} kW` : ""],
+    ["CO2", resultaat.co2_uitstoot_gecombineerd ? `${resultaat.co2_uitstoot_gecombineerd} g/km` : ""],
+    ["APK vervaldatum", resultaat.vervaldatum_apk],
+  ].filter(([, v]) => v) as [string, string][] : [];
+
+  return (
+    <div style={{ backgroundColor: "#ffffff", border: "1px solid rgba(0,19,55,0.07)" }}>
+      <div className="px-5 py-4 flex items-center gap-2" style={{ borderBottom: "1px solid rgba(0,19,55,0.07)" }}>
+        <Search size={15} style={{ color: "#001337" }} />
+        <h2 className="text-sm font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#001337" }}>Kenteken Check</h2>
+      </div>
+      <div className="p-4">
+        <div className="flex gap-2 mb-3">
+          <input
+            type="text"
+            value={kenteken}
+            onChange={(e) => setKenteken(e.target.value.toUpperCase())}
+            onKeyDown={(e) => e.key === "Enter" && zoek()}
+            placeholder="bijv. AB-123-C"
+            className="flex-1 px-3 py-2 text-sm outline-none"
+            style={{ border: "1px solid rgba(0,19,55,0.15)", color: "#001337", fontFamily: "var(--font-inter)", backgroundColor: "#fafafa" }}
+          />
+          <button
+            type="button"
+            onClick={zoek}
+            disabled={laden}
+            className="px-4 py-2 text-sm font-semibold transition-all hover:opacity-80 disabled:opacity-50"
+            style={{ backgroundColor: "#001337", color: "#ffffff", fontFamily: "var(--font-inter)" }}
+          >
+            {laden ? "..." : "Zoek"}
+          </button>
+        </div>
+        {fout && <p className="text-xs" style={{ color: "#b91c1c", fontFamily: "var(--font-inter)" }}>{fout}</p>}
+        {velden.length > 0 && (
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+            {velden.map(([l, v]) => (
+              <div key={l} className="flex items-baseline gap-1.5">
+                <p className="text-[10px] flex-shrink-0" style={{ color: "rgba(0,19,55,0.4)", fontFamily: "var(--font-inter)", minWidth: 90 }}>{l}</p>
+                <p className="text-xs font-semibold truncate" style={{ color: "#001337", fontFamily: "var(--font-inter)" }}>{v}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
