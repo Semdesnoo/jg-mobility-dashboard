@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     // Afspraakformulier
     if (body.type === "appointment") {
-      const { email, telefoon, datum, tijd } = body;
+      const { email, telefoon, datum, datumISO, tijd } = body;
       await resend.emails.send({
         from: "JG Mobility Website <noreply@jgmobility.nl>",
         to: TO_EMAIL,
@@ -43,6 +43,13 @@ export async function POST(req: NextRequest) {
         INSERT INTO leads (id, telefoon, email, bron, interesse, notitie, status)
         VALUES (${`lead_apt_${Date.now()}`}, ${telefoon ?? ""}, ${email ?? ""},
                 ${"website"}, ${"Afspraakverzoek"}, ${`Datum: ${datum} om ${tijd}`}, ${"nieuw"})
+      `.catch(() => null);
+      // Afspraak aanmaken in dashboard (gebruik ISO datum voor correcte weergave)
+      await sql`
+        INSERT INTO afspraken (id, datum, tijd, type, klant_email, klant_telefoon, status, notitie)
+        VALUES (${`apt_${Date.now()}`}, ${datumISO ?? datum ?? ""}, ${tijd ?? ""},
+                ${"bezichtiging"}, ${email ?? ""}, ${telefoon ?? ""},
+                ${"gepland"}, ${"Via website aangevraagd"})
       `.catch(() => null);
       return NextResponse.json({ ok: true });
     }

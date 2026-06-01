@@ -115,6 +115,7 @@ export default function AppointmentScheduler() {
         email,
         telefoon: phone,
         datum: formatDateFull(selectedDate),
+        datumISO: selectedDate.toISOString().slice(0, 10),
         tijd: selectedTime,
       }),
     });
