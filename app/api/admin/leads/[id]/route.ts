@@ -5,12 +5,18 @@ export const dynamic = "force-dynamic";
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const body = await req.json();
-  const fields = ["naam", "telefoon", "email", "bron", "interesse", "budget", "notitie", "status"];
-  for (const f of fields) {
-    if (body[f] !== undefined) {
-      await sql`UPDATE leads SET ${sql(f)} = ${body[f]} WHERE id = ${id}`;
-    }
-  }
+  await sql`
+    UPDATE leads SET
+      naam      = COALESCE(${body.naam      ?? null}, naam),
+      telefoon  = COALESCE(${body.telefoon  ?? null}, telefoon),
+      email     = COALESCE(${body.email     ?? null}, email),
+      bron      = COALESCE(${body.bron      ?? null}, bron),
+      interesse = COALESCE(${body.interesse ?? null}, interesse),
+      budget    = COALESCE(${body.budget    ?? null}, budget),
+      notitie   = COALESCE(${body.notitie   ?? null}, notitie),
+      status    = COALESCE(${body.status    ?? null}, status)
+    WHERE id = ${id}
+  `;
   const row = await sql`SELECT * FROM leads WHERE id = ${id}`;
   return Response.json(row[0] ?? null);
 }

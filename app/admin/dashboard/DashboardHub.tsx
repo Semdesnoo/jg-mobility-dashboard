@@ -335,7 +335,7 @@ export default function DashboardHub() {
           />
         )}
         {tab === "email" && <EmailContent />}
-        {tab === "voorraad" && <VoorraadContent autos={autos} refresh={refresh} setTab={setTab} setMobileHub={setMobileHub} />}
+        {tab === "voorraad" && <VoorraadContent autos={autos} refresh={refresh} />}
         {tab === "leads" && <LeadsContent />}
         {tab === "klanten" && <KlantenContent />}
         {tab === "afspraken" && <AfsprakenContent />}
